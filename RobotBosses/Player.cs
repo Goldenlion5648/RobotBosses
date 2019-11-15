@@ -7,21 +7,23 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-
 namespace RobotBosses
 {
-    class Enemy : Character
+    class Player: Character
     {
-        public Enemy(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
+        public int hitCooldown { get; set; }
+
+        public Player(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
+            this.health = 100;
         }
 
-        public void makePaths()
+        public void Update(GameTime gameTime)
         {
-
+            //if(rec.Intersects())
+            hitCooldown--;
         }
-
     }
 }

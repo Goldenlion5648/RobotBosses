@@ -12,8 +12,12 @@ namespace RobotBosses
 {
     class Character
     {
-        Texture2D texture;
-        Rectangle rec;
+        public Texture2D texture;
+        public Rectangle rec;
+        public int health { get; set; }
+
+
+        //public Rectangle rec2 { get { return rec2}; set; }
 
         public Character(Texture2D tex, Rectangle rectangle)
         {
@@ -21,6 +25,50 @@ namespace RobotBosses
             texture = tex;
         }
 
+        public Rectangle getRec()
+        {
+            return rec;
+        }
 
+        public int getRecX()
+        {
+            return rec.X;
+        }
+
+        public int getRecY()
+        {
+            return rec.Y;
+        }
+
+        public void setRecX(int newValue)
+        {
+            rec.X = newValue;
+        }
+
+        public void setRecY(int newValue)
+        {
+            rec.Y = newValue;
+        }
+
+        public void incrementRecX(int amount)
+        {
+            rec.X += amount;
+        }
+
+        public void incrementRecY(int amount)
+        {
+            rec.Y += amount;
+        }
+
+
+        public void drawCharacter(SpriteBatch sb)
+        {
+            sb.Draw(texture, rec, Color.White);
+        }
+
+        public void drawCharacter(SpriteBatch sb, Color color)
+        {
+            sb.Draw(texture, rec, color);
+        }
     }
 }

@@ -7,21 +7,17 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-
 namespace RobotBosses
 {
-    class Enemy : Character
+    class ShadowPath: Enemy
     {
-        public Enemy(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
+
+        public ShadowPath(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
         }
 
-        public void makePaths()
-        {
-
-        }
 
     }
 }
