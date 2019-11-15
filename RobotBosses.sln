@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29418.71
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotBosses", "RobotBosses\RobotBosses.csproj", "{23660816-328A-4D4E-9DBA-E6B8752E96CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23660816-328A-4D4E-9DBA-E6B8752E96CE}.Debug|x86.ActiveCfg = Debug|x86
+		{23660816-328A-4D4E-9DBA-E6B8752E96CE}.Debug|x86.Build.0 = Debug|x86
+		{23660816-328A-4D4E-9DBA-E6B8752E96CE}.Release|x86.ActiveCfg = Release|x86
+		{23660816-328A-4D4E-9DBA-E6B8752E96CE}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C05ED76C-2678-4C19-AF3B-48F0753FC8FF}
+	EndGlobalSection
+EndGlobal
