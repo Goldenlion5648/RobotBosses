@@ -25,6 +25,8 @@ namespace RobotBosses
         bool shouldMakeShadowPaths = false;
         bool shouldAddShadow = true;
 
+        
+
 
         int gameClock = 1;
 
@@ -97,7 +99,7 @@ namespace RobotBosses
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
             pathMaker = new Enemy(ref blankSquare,
-                new Rectangle(screenWidth - 10, 500, playerWidth / 2, playerWidth));
+                new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth / 2, playerWidth));
 
             pathMaker.speed = 2;
 
@@ -143,21 +145,22 @@ namespace RobotBosses
             // TODO: Add your update logic here
 
             oldkb = kb;
-            player.Update(gameTime);
+           // player.Update(gameTime);
             base.Update(gameTime);
         }
 
         public void shadowBossLevel()
         {
             userControls();
-            checkShadowLevelCollision();
+            collideWithPlayer(30, shadowBoss.getRec());
 
             if (shadowBoss.shouldDoAcrossAttack)
             {
                 for (int i = 0; i < 4; i++)
                 {
                     shadowBoss.acrossScreenAttack();
-                    checkShadowLevelCollision();
+            collideWithPlayer(30, shadowBoss.getRec());
+
 
                 }
             }
@@ -167,8 +170,27 @@ namespace RobotBosses
             endOfTickCode();
         }
 
+        public void collideWithPlayer(int damage, Rectangle objectCollided)
+        {
+            if(player.getRec().Intersects(objectCollided))
+            {
+                if(player.hitCooldown == 0)
+                {
+                    player.hitCooldown = 180;
+                player.health -= damage;
+                }
+
+            }
+
+
+        }
+
         public void endOfTickCode()
         {
+            if(player.hitCooldown > 0)
+            {
+                player.hitCooldown--;
+            }
             gameClock++;
         }
 
@@ -177,49 +199,58 @@ namespace RobotBosses
             if (shouldMakeShadowPaths == false)
                 return;
 
-            for (int i = 0; i < pathMaker.speed; i++)
+            if (currentShadowPathNum < 3)
             {
+                for (int i = 0; i < pathMaker.speed; i++)
+                {
 
-                if (currentShadowPathNum != -1 && shadowPathList[currentShadowPathNum].getRecX() > 0)
-                {
-                    shouldAddShadow = false;
-                }
-                else
-                {
-                    shouldAddShadow = true;
-                    if (currentShadowPathNum != -1)
+                    if (currentShadowPathNum != -1 && shadowPathList[currentShadowPathNum].getRecX() > 0)
                     {
-                        //pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 5 / 2, pathMaker.getRecY() - 30));
-                        pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 2, pathMaker.getRec().Height * 5));
-                        pathMaker.setRecX(screenWidth - 20);
-                        pathMaker.speed = 3;
+                        shouldAddShadow = false;
                     }
                     else
                     {
-
+                        shouldAddShadow = true;
+                        if (currentShadowPathNum != -1)
+                        {
+                            //pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 5 / 2, pathMaker.getRecY() - 30));
+                            //pathMaker.setRecY(rand.Next((3 - currentShadowPathNum) * pathMaker.getRec().Height,
+                            //    (4 - currentShadowPathNum) * pathMaker.getRec().Height));
+                            pathMaker.incrementRecY(-rand.Next(3 * pathMaker.getRec().Height, 5 * pathMaker.getRec().Height));
+                            pathMaker.setRecX(screenWidth - 20);
+                            pathMaker.speed = 3;
+                        }
                     }
+
+                    if (shouldAddShadow)
+                    {
+                        shadowPathList.Add(new ShadowPath(ref blankSquare,
+                            new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
+                        if (currentShadowPathNum < 3)
+                        {
+                            currentShadowPathNum += 1;
+                        }
+                    }
+
+                    shadowPathList[currentShadowPathNum].incrementRecX(-1);
+                    shadowPathList[currentShadowPathNum].incrementRecWidth(1);
+
+                    pathMaker.incrementRecX(-1);
+                    collideWithPlayer(30, pathMaker.getRec());
+
                 }
-
-                if (shouldAddShadow)
-                {
-                    shadowPathList.Add(new ShadowPath(ref blankSquare,
-                        new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
-                    currentShadowPathNum += 1;
-                }
-
-                shadowPathList[currentShadowPathNum].incrementRecX(-1);
-                shadowPathList[currentShadowPathNum].incrementRecWidth(1);
-
-                pathMaker.incrementRecX(-1);
             }
 
-            if (gameClock % 5 == 0)
+            if (gameClock % 15 == 0)
             {
 
                 for (int i = 0; i < shadowPathList.Count; i++)
                 {
                     shadowPathList[i].incrementRecHeight(2);
                     shadowPathList[i].incrementRecY(-1);
+                    collideWithPlayer(30, shadowPathList[i].getRec());
+
+
                 }
             }
 
@@ -230,15 +261,6 @@ namespace RobotBosses
             }
 
 
-        }
-
-        public void checkShadowLevelCollision()
-        {
-            if (player.getRec().Intersects(shadowBoss.getRec()) && player.hitCooldown == 0)
-            {
-                player.health -= 30;
-                player.hitCooldown = 180;
-            }
         }
 
         public void userControls()

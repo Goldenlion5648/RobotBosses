@@ -20,12 +20,5 @@ namespace RobotBosses
             this.health = 100;
         }
 
-        public void Update(GameTime gameTime)
-        {
-            //if(rec.Intersects())
-
-            if (hitCooldown > 0)
-                hitCooldown--;
-        }
     }
 }
