@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System.Collections.Generic;
+using System;
 
 namespace RobotBosses
 {
@@ -13,12 +15,25 @@ namespace RobotBosses
         SpriteBatch spriteBatch;
 
         Player player;
-        Enemy shadowBoss;
+        ShadowBoss shadowBoss;
+        Random rand = new Random();
 
         Texture2D blankSquare;
         SpriteFont debugFont;
 
         KeyboardState kb, oldkb;
+        bool shouldMakeShadowPaths = false;
+        bool shouldAddShadow = true;
+
+
+        int gameClock = 1;
+
+        List<ShadowPath> shadowPathList = new List<ShadowPath>();
+
+        Character bossHealthBar;
+        Character playerHealthBar;
+
+        Enemy pathMaker;
 
 
         int screenWidth = 1080;
@@ -27,7 +42,7 @@ namespace RobotBosses
         int playerHeight = 100;
         int playerWidth = 60;
 
-        int playerSpeed = 5;
+        int currentShadowPathNum = -1;
 
 
         enum gameState
@@ -78,11 +93,16 @@ namespace RobotBosses
 
             blankSquare = Content.Load<Texture2D>("blankSquare");
 
-            player = new Player(blankSquare,
+            player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
-            shadowBoss = new Enemy(blankSquare,
-                new Rectangle(600, 200, playerWidth, playerHeight * 5 / 2));
+            pathMaker = new Enemy(ref blankSquare,
+                new Rectangle(screenWidth - 10, 500, playerWidth / 2, playerWidth));
+
+            pathMaker.speed = 2;
+
+            shadowBoss = new ShadowBoss(ref blankSquare,
+                new Rectangle(600, 200, playerWidth * 4, playerHeight / 3));
 
             // TODO: use this.Content to load your game content here
         }
@@ -130,13 +150,120 @@ namespace RobotBosses
         public void shadowBossLevel()
         {
             userControls();
+            checkShadowLevelCollision();
+
+            if (shadowBoss.shouldDoAcrossAttack)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    shadowBoss.acrossScreenAttack();
+                    checkShadowLevelCollision();
+
+                }
+            }
+            //shadowBoss.animate();
+            makeShadowPaths();
+
+            endOfTickCode();
+        }
+
+        public void endOfTickCode()
+        {
+            gameClock++;
+        }
+
+        public void makeShadowPaths()
+        {
+            if (shouldMakeShadowPaths == false)
+                return;
+
+            for (int i = 0; i < pathMaker.speed; i++)
+            {
+
+                if (currentShadowPathNum != -1 && shadowPathList[currentShadowPathNum].getRecX() > 0)
+                {
+                    shouldAddShadow = false;
+                }
+                else
+                {
+                    shouldAddShadow = true;
+                    if (currentShadowPathNum != -1)
+                    {
+                        //pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 5 / 2, pathMaker.getRecY() - 30));
+                        pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 2, pathMaker.getRec().Height * 5));
+                        pathMaker.setRecX(screenWidth - 20);
+                        pathMaker.speed = 3;
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                if (shouldAddShadow)
+                {
+                    shadowPathList.Add(new ShadowPath(ref blankSquare,
+                        new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
+                    currentShadowPathNum += 1;
+                }
+
+                shadowPathList[currentShadowPathNum].incrementRecX(-1);
+                shadowPathList[currentShadowPathNum].incrementRecWidth(1);
+
+                pathMaker.incrementRecX(-1);
+            }
+
+            if (gameClock % 5 == 0)
+            {
+
+                for (int i = 0; i < shadowPathList.Count; i++)
+                {
+                    shadowPathList[i].incrementRecHeight(2);
+                    shadowPathList[i].incrementRecY(-1);
+                }
+            }
+
+            if (gameClock % 5 == 0)
+            {
+                //pathMaker.speed = (int)System.Math.Pow(pathMaker.speed, 1.7);
+                pathMaker.speed += 1;
+            }
+
+
+        }
+
+        public void checkShadowLevelCollision()
+        {
+            if (player.getRec().Intersects(shadowBoss.getRec()) && player.hitCooldown == 0)
+            {
+                player.health -= 30;
+                player.hitCooldown = 180;
+            }
         }
 
         public void userControls()
         {
-            if(kb.IsKeyDown(Keys.A) || kb.IsKeyDown(Keys.Left))
+            //debug keybinds
+            if (kb.IsKeyDown(Keys.L) && oldkb.IsKeyUp(Keys.L))
             {
-                for (int i = 0; i < playerSpeed; i++)
+                shadowBoss.shouldDoAcrossAttack = true;
+            }
+
+            if (kb.IsKeyDown(Keys.R) && oldkb.IsKeyUp(Keys.R))
+            {
+                shadowBoss.rotateToUpper();
+            }
+
+            if (kb.IsKeyDown(Keys.P) && oldkb.IsKeyUp(Keys.P))
+            {
+                shouldMakeShadowPaths = !shouldMakeShadowPaths;
+            }
+
+
+
+            if (kb.IsKeyDown(Keys.A) || kb.IsKeyDown(Keys.Left))
+            {
+                for (int i = 0; i < player.speed; i++)
                 {
                     player.incrementRecX(-1);
                 }
@@ -144,7 +271,7 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.D) || kb.IsKeyDown(Keys.Right))
             {
-                for (int i = 0; i < playerSpeed; i++)
+                for (int i = 0; i < player.speed; i++)
                 {
                     player.incrementRecX(1);
                 }
@@ -152,7 +279,7 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.W) || kb.IsKeyDown(Keys.Up))
             {
-                for (int i = 0; i < playerSpeed; i++)
+                for (int i = 0; i < player.speed; i++)
                 {
                     player.incrementRecY(-1);
                 }
@@ -160,7 +287,7 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.S) || kb.IsKeyDown(Keys.Down))
             {
-                for (int i = 0; i < playerSpeed; i++)
+                for (int i = 0; i < player.speed; i++)
                 {
                     player.incrementRecY(1);
                 }
@@ -179,14 +306,25 @@ namespace RobotBosses
 
 
 
-            shadowBoss.drawCharacter(spriteBatch, Color.Black);
+            //shadowBoss.drawCharacter(spriteBatch, Color.Black);
+            shadowBoss.drawCharacter(spriteBatch, Color.Black, true);
             player.drawCharacter(spriteBatch, Color.Red);
+            pathMaker.drawCharacter(spriteBatch, Color.Purple);
+
+            for (int i = 0; i < shadowPathList.Count; i++)
+            {
+                shadowPathList[i].drawCharacter(spriteBatch, Color.Black);
+            }
 
 
 
 
 
             spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
+            spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
+            
+            
+            
             spriteBatch.End();
 
             // TODO: Add your drawing code here

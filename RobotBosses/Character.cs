@@ -15,11 +15,23 @@ namespace RobotBosses
         public Texture2D texture;
         public Rectangle rec;
         public int health { get; set; }
+        public int speed { get; set; } = 5;
 
 
         //public Rectangle rec2 { get { return rec2}; set; }
 
+        public Character()
+        {
+
+        }
+
         public Character(Texture2D tex, Rectangle rectangle)
+        {
+            rec = rectangle;
+            texture = tex;
+        }
+
+        public Character(ref Texture2D tex, Rectangle rectangle)
         {
             rec = rectangle;
             texture = tex;
@@ -55,18 +67,28 @@ namespace RobotBosses
             rec.X += amount;
         }
 
+        public void incrementRecWidth(int amount)
+        {
+            rec.Width += amount;
+        }
+
+        public void incrementRecHeight(int amount)
+        {
+            rec.Height += amount;
+        }
+
         public void incrementRecY(int amount)
         {
             rec.Y += amount;
         }
 
 
-        public void drawCharacter(SpriteBatch sb)
+        public virtual void drawCharacter(SpriteBatch sb)
         {
             sb.Draw(texture, rec, Color.White);
         }
 
-        public void drawCharacter(SpriteBatch sb, Color color)
+        public virtual void drawCharacter(SpriteBatch sb, Color color)
         {
             sb.Draw(texture, rec, color);
         }

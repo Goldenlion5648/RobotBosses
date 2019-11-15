@@ -12,13 +12,13 @@ namespace RobotBosses
 {
     class Enemy : Character
     {
-        public Enemy(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
+        public Enemy(ref Texture2D tex, Rectangle rectangle) : base(ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
         }
 
-        public void makePaths()
+        public Enemy()
         {
 
         }

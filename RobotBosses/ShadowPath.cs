@@ -12,7 +12,7 @@ namespace RobotBosses
     class ShadowPath: Enemy
     {
 
-        public ShadowPath(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
+        public ShadowPath(ref Texture2D tex, Rectangle rectangle) : base(ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;

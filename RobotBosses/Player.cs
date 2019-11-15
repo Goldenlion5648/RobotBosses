@@ -13,7 +13,7 @@ namespace RobotBosses
     {
         public int hitCooldown { get; set; }
 
-        public Player(Texture2D tex, Rectangle rectangle) : base(tex, rectangle)
+        public Player(ref Texture2D tex, Rectangle rectangle) : base( ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
@@ -23,7 +23,9 @@ namespace RobotBosses
         public void Update(GameTime gameTime)
         {
             //if(rec.Intersects())
-            hitCooldown--;
+
+            if (hitCooldown > 0)
+                hitCooldown--;
         }
     }
 }
