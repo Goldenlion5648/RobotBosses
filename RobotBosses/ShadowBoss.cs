@@ -15,11 +15,31 @@ namespace RobotBosses
         Rectangle body;
         Rectangle tail;
 
+        enum facing
+        {
+            up =1, right, down, left
+        }
+
+        facing direction = facing.left;
+
+
 
 
         //List<Rectangle> parts = new List<Rectangle>();
 
         bool widthLarger;
+        bool hasStartedRotating = false;
+        bool isFinishedRotating = false;
+
+        int xHeadDistance = 0;
+        int yHeadDistance = 0;
+
+        int xBodyDistance = 0;
+        int yBodyDistance = 0;
+
+        int xTailDistance = 0;
+        int yTailDistance = 0;
+
         public bool hasStartedAcrossAttack { get; set; }
         public bool shouldDoAcrossAttack { get; set; }
 
@@ -115,33 +135,83 @@ namespace RobotBosses
 
         }
 
-        public void rotateToUpper()
+        public void spinAttack()
         {
-            head.X = body.X;
-            head.Y = body.Top - head.Height;
-            head.Height = (rec.Width / 3);
-            head.Width = rec.Height;
+
+        }
+
+        public void splitUpAttack()
+        {
+
+        }
+
+        public void rotateToUpper(int gameClock)
+        {
+            //head.X = body.X;
+            //head.Y = body.Top - head.Height;
+            //head.Height = (rec.Width / 3);
+            //head.Width = rec.Height;
 
 
-            body.X += 20;
-            body.Y = head.Bottom;
-            body.Height = (rec.Width / 3);
-            body.Width = rec.Height;
+            //body.X += 20;
+            //body.Y = head.Bottom;
+            //body.Height = (rec.Width / 3);
+            //body.Width = rec.Height;
 
-            tail.X = body.X - 30;
-            tail.Y = body.Bottom;
-            tail.Height = (rec.Width / 3);
-            tail.Width = rec.Height;
+            //tail.X = body.X - 30;
+            //tail.Y = body.Bottom;
+            //tail.Height = (rec.Width / 3);
+            //tail.Width = rec.Height;
 
-            int temp = rec.Height;
-            int tempPos = rec.Center.X - (rec.Width / 2);
-            rec.Height = rec.Width;
-            rec.Width = temp;
-            rec.X = head.Center.X - (rec.Width / 2);
-            rec.Y = head.Y;
 
-            head.X -= 20;
-            tail.X -= 10;
+            if (hasStartedRotating == false)
+            {
+                if(rec.Contains(head.Center) == false || 
+                    rec.Contains(body.Center) == false ||
+                    rec.Contains(tail.Center) == false)
+                {
+                    head.X = rec.X;
+                    head.Y = rec.Y;
+                }
+                int temp = rec.Height;
+
+                //int tempPos = rec.Center.X - (rec.Width / 2);
+                rec.Height = rec.Width;
+                rec.Width = temp;
+                //rec.X = head.Center.X - (rec.Width / 2);
+                //rec.Y = head.Y;
+                isFinishedRotating = false;
+                hasStartedRotating = true;
+            }
+
+            if (isFinishedRotating == false)
+            {
+                if (xTailDistance == 0)
+                {
+
+                    //xHeadDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
+                    //yHeadDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
+
+                    //xBodyDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
+                    //yBodyDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
+
+                    xTailDistance = Math.Abs(tail.Center.X - (rec.Center.X));
+                    yTailDistance = Math.Abs(tail.Center.Y - (rec.Y + rec.Height * 2 / 3));
+                }
+
+                //if (gameClock % 2 == 0)
+                //{
+                    if (rec.Contains(tail.Center) == false)
+                    {
+                        tail.X -= xTailDistance / 20;
+                        tail.Y += yTailDistance / 20;
+                    }
+                //}
+            }
+
+
+
+
             //rec.X -= 40;
 
             widthLarger = false;

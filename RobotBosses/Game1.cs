@@ -25,7 +25,7 @@ namespace RobotBosses
         bool shouldMakeShadowPaths = false;
         bool shouldAddShadow = true;
 
-        
+
 
 
         int gameClock = 1;
@@ -65,7 +65,7 @@ namespace RobotBosses
 
             this.IsMouseVisible = true;
 
-            
+
 
         }
 
@@ -99,7 +99,7 @@ namespace RobotBosses
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
             playerHealthBar = new HealthBar(ref blankSquare,
-                new Rectangle(50, 50, 200, 45), 5);
+                new Rectangle(30, 20, 200, 45), 5);
 
             pathMaker = new Enemy(ref blankSquare,
                 new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth, playerWidth));
@@ -148,7 +148,7 @@ namespace RobotBosses
             // TODO: Add your update logic here
 
             oldkb = kb;
-           // player.Update(gameTime);
+            // player.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -162,11 +162,12 @@ namespace RobotBosses
                 for (int i = 0; i < 4; i++)
                 {
                     shadowBoss.acrossScreenAttack();
-            collideWithPlayer(30, shadowBoss.getRec());
+                    collideWithPlayer(30, shadowBoss.getRec());
 
 
                 }
             }
+            //shadowBoss.rotateToUpper(gameClock);
             //shadowBoss.animate();
             makeShadowPaths();
 
@@ -175,12 +176,12 @@ namespace RobotBosses
 
         public void collideWithPlayer(int damage, Rectangle objectCollided)
         {
-            if(player.getRec().Intersects(objectCollided))
+            if (player.getRec().Intersects(objectCollided))
             {
-                if(player.hitCooldown == 0)
+                if (player.hitCooldown == 0)
                 {
                     player.hitCooldown = 120;
-                player.health -= damage;
+                    player.health -= damage;
                 }
 
             }
@@ -192,7 +193,7 @@ namespace RobotBosses
         {
 
             playerHealthBar.setRecWidth(player.health * 2);
-            if(player.hitCooldown > 0)
+            if (player.hitCooldown > 0)
             {
                 player.hitCooldown--;
             }
@@ -246,26 +247,31 @@ namespace RobotBosses
                     }
                     else
                     {
+                        //clear shadow paths
                         shouldMakeShadowPaths = false;
                         pathMaker.setRecY(-playerWidth);
+                        shadowPathList.Clear();
                     }
                 }
 
-                if (currentShadowPathNum < 3)
+                if (shouldMakeShadowPaths)
                 {
-                    shadowPathList[currentShadowPathNum].incrementRecX(-1);
-                    pathMaker.incrementRecX(-1);
-                    shadowPathList[currentShadowPathNum].incrementRecWidth(1);
+                    if (currentShadowPathNum < 3)
+                    {
+                        shadowPathList[currentShadowPathNum].incrementRecX(-1);
+                        pathMaker.incrementRecX(-1);
+                        shadowPathList[currentShadowPathNum].incrementRecWidth(1);
+                    }
+                    else
+                    {
+                        //shadowPathList[currentShadowPathNum].incrementRecY(1);
+                        shadowPathList[currentShadowPathNum].incrementRecHeight(1);
+                        pathMaker.incrementRecY(1);
+
+
+                    }
+
                 }
-                else
-                {
-                    //shadowPathList[currentShadowPathNum].incrementRecY(1);
-                    shadowPathList[currentShadowPathNum].incrementRecHeight(1);
-                    pathMaker.incrementRecY(1);
-
-
-                }
-
 
             }
 
@@ -275,7 +281,7 @@ namespace RobotBosses
 
                 for (int i = 0; i < shadowPathList.Count; i++)
                 {
-                    if(i < 3)
+                    if (i < 3)
                     {
                         shadowPathList[i].incrementRecHeight(2);
                         shadowPathList[i].incrementRecY(-1);
@@ -285,7 +291,7 @@ namespace RobotBosses
                         shadowPathList[i].incrementRecWidth(2);
                         shadowPathList[i].incrementRecX(-1);
                     }
-                    
+
                     collideWithPlayer(30, shadowPathList[i].getRec());
 
 
@@ -309,9 +315,9 @@ namespace RobotBosses
                 shadowBoss.shouldDoAcrossAttack = true;
             }
 
-            if (kb.IsKeyDown(Keys.R) && oldkb.IsKeyUp(Keys.R))
+            if (kb.IsKeyDown(Keys.R))
             {
-                shadowBoss.rotateToUpper();
+                shadowBoss.rotateToUpper(gameClock);
             }
 
             if (kb.IsKeyDown(Keys.P) && oldkb.IsKeyUp(Keys.P))
@@ -376,9 +382,9 @@ namespace RobotBosses
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
             shadowBoss.drawCharacter(spriteBatch, Color.Black, true);
 
-            if(player.hitCooldown > 0)
+            if (player.hitCooldown > 0)
             {
-                if(gameClock % 8 != 0)
+                if (gameClock % 8 != 0)
                 {
                     player.drawCharacter(spriteBatch, Color.Red);
 
@@ -386,7 +392,7 @@ namespace RobotBosses
             }
             else
             {
-            player.drawCharacter(spriteBatch, Color.Red);
+                player.drawCharacter(spriteBatch, Color.Red);
 
             }
 
@@ -401,7 +407,7 @@ namespace RobotBosses
 
 
 
-            playerHealthBar.drawCharacter(spriteBatch, new Color(128, 0, 0), Color.Black);
+            playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30), Color.Black);
             spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
             spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
