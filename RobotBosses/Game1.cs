@@ -224,10 +224,10 @@ namespace RobotBosses
 
                     if (shouldAddShadow)
                     {
-                        shadowPathList.Add(new ShadowPath(ref blankSquare,
-                            new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
                         if (currentShadowPathNum < 3)
                         {
+                            shadowPathList.Add(new ShadowPath(ref blankSquare,
+                                new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
                             currentShadowPathNum += 1;
                         }
                     }
@@ -236,11 +236,15 @@ namespace RobotBosses
                     shadowPathList[currentShadowPathNum].incrementRecWidth(1);
 
                     pathMaker.incrementRecX(-1);
-                    collideWithPlayer(30, pathMaker.getRec());
 
                 }
-            }
 
+            }
+            else
+            {
+
+            }
+            //collideWithPlayer(30, pathMaker.getRec());
             if (gameClock % 15 == 0)
             {
 
