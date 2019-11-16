@@ -325,7 +325,8 @@ namespace RobotBosses
             {
                 for (int i = 0; i < player.speed; i++)
                 {
-                    player.incrementRecX(-1);
+                    if (player.getRecX() - 1 >= 0)
+                        player.incrementRecX(-1);
                 }
             }
 
@@ -333,7 +334,9 @@ namespace RobotBosses
             {
                 for (int i = 0; i < player.speed; i++)
                 {
-                    player.incrementRecX(1);
+                    if (player.getRec().Right + 1 <= screenWidth)
+                        player.incrementRecX(1);
+
                 }
             }
 
@@ -341,7 +344,9 @@ namespace RobotBosses
             {
                 for (int i = 0; i < player.speed; i++)
                 {
-                    player.incrementRecY(-1);
+                    if (player.getRecY() - 1 >= 0)
+                        player.incrementRecY(-1);
+
                 }
             }
 
@@ -349,7 +354,9 @@ namespace RobotBosses
             {
                 for (int i = 0; i < player.speed; i++)
                 {
-                    player.incrementRecY(1);
+                    if (player.getRec().Bottom + 1 <= screenHeight)
+                        player.incrementRecY(1);
+
                 }
             }
         }
