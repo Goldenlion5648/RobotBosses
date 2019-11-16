@@ -99,7 +99,7 @@ namespace RobotBosses
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
             pathMaker = new Enemy(ref blankSquare,
-                new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth / 2, playerWidth));
+                new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth, playerWidth));
 
             pathMaker.speed = 2;
 
@@ -199,59 +199,81 @@ namespace RobotBosses
             if (shouldMakeShadowPaths == false)
                 return;
 
-            if (currentShadowPathNum < 3)
+            for (int i = 0; i < pathMaker.speed; i++)
             {
-                for (int i = 0; i < pathMaker.speed; i++)
+                if (currentShadowPathNum != -1 &&
+                        ((shadowPathList[currentShadowPathNum].getRecX() > 0 && currentShadowPathNum < 3) ||
+                        shadowPathList[currentShadowPathNum].getRec().Bottom < screenHeight && currentShadowPathNum >= 3))
                 {
-
-                    if (currentShadowPathNum != -1 && shadowPathList[currentShadowPathNum].getRecX() > 0)
+                    shouldAddShadow = false;
+                }
+                else
+                {
+                    shouldAddShadow = true;
+                    if (currentShadowPathNum != -1)
                     {
-                        shouldAddShadow = false;
-                    }
-                    else
-                    {
-                        shouldAddShadow = true;
-                        if (currentShadowPathNum != -1)
+                        //pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 5 / 2, pathMaker.getRecY() - 30));
+                        //pathMaker.setRecY(rand.Next((3 - currentShadowPathNum) * pathMaker.getRec().Height,
+                        //    (4 - currentShadowPathNum) * pathMaker.getRec().Height));
+                        if (currentShadowPathNum < 2)
                         {
-                            //pathMaker.incrementRecY(-1 * rand.Next(pathMaker.getRec().Height * 5 / 2, pathMaker.getRecY() - 30));
-                            //pathMaker.setRecY(rand.Next((3 - currentShadowPathNum) * pathMaker.getRec().Height,
-                            //    (4 - currentShadowPathNum) * pathMaker.getRec().Height));
                             pathMaker.incrementRecY(-rand.Next(3 * pathMaker.getRec().Height, 5 * pathMaker.getRec().Height));
                             pathMaker.setRecX(screenWidth - 20);
-                            pathMaker.speed = 3;
                         }
-                    }
-
-                    if (shouldAddShadow)
-                    {
-                        if (currentShadowPathNum < 3)
+                        else
                         {
-                            shadowPathList.Add(new ShadowPath(ref blankSquare,
-                                new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
-                            currentShadowPathNum += 1;
+                            pathMaker.setRecY(-20);
+                            pathMaker.setRecX(player.getRecX());
+
                         }
+                        pathMaker.speed = 3;
                     }
+                }
 
+                if (shouldAddShadow)
+                {
+
+                    shadowPathList.Add(new ShadowPath(ref blankSquare,
+                        new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
+
+                    currentShadowPathNum += 1;
+                }
+
+                if (currentShadowPathNum < 3)
+                {
                     shadowPathList[currentShadowPathNum].incrementRecX(-1);
-                    shadowPathList[currentShadowPathNum].incrementRecWidth(1);
-
                     pathMaker.incrementRecX(-1);
+                    shadowPathList[currentShadowPathNum].incrementRecWidth(1);
+                }
+                else
+                {
+                    //shadowPathList[currentShadowPathNum].incrementRecY(1);
+                    shadowPathList[currentShadowPathNum].incrementRecHeight(1);
+                    pathMaker.incrementRecY(1);
+
 
                 }
 
-            }
-            else
-            {
 
             }
+
             //collideWithPlayer(30, pathMaker.getRec());
             if (gameClock % 15 == 0)
             {
 
                 for (int i = 0; i < shadowPathList.Count; i++)
                 {
-                    shadowPathList[i].incrementRecHeight(2);
-                    shadowPathList[i].incrementRecY(-1);
+                    if(i < 3)
+                    {
+                        shadowPathList[i].incrementRecHeight(2);
+                        shadowPathList[i].incrementRecY(-1);
+                    }
+                    else
+                    {
+                        shadowPathList[i].incrementRecWidth(2);
+                        shadowPathList[i].incrementRecX(-1);
+                    }
+                    
                     collideWithPlayer(30, shadowPathList[i].getRec());
 
 
@@ -348,9 +370,10 @@ namespace RobotBosses
 
             spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
-            
-            
-            
+            spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
+
+
+
             spriteBatch.End();
 
             // TODO: Add your drawing code here
