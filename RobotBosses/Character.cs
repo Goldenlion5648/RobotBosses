@@ -62,6 +62,16 @@ namespace RobotBosses
             rec.Y = newValue;
         }
 
+        public void setRecWidth(int newValue)
+        {
+            rec.Width = newValue;
+        }
+
+        public void setRecHeight(int newValue)
+        {
+            rec.Height = newValue;
+        }
+
         public void incrementRecX(int amount)
         {
             rec.X += amount;

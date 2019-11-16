@@ -12,6 +12,7 @@ namespace RobotBosses
 {
     class Enemy : Character
     {
+
         public Enemy(ref Texture2D tex, Rectangle rectangle) : base(ref tex, rectangle)
         {
             this.rec = rectangle;

@@ -32,8 +32,8 @@ namespace RobotBosses
 
         List<ShadowPath> shadowPathList = new List<ShadowPath>();
 
-        Character bossHealthBar;
-        Character playerHealthBar;
+        HealthBar bossHealthBar;
+        HealthBar playerHealthBar;
 
         Enemy pathMaker;
 
@@ -97,6 +97,9 @@ namespace RobotBosses
 
             player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
+
+            playerHealthBar = new HealthBar(ref blankSquare,
+                new Rectangle(50, 50, 200, 45), 5);
 
             pathMaker = new Enemy(ref blankSquare,
                 new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth, playerWidth));
@@ -176,7 +179,7 @@ namespace RobotBosses
             {
                 if(player.hitCooldown == 0)
                 {
-                    player.hitCooldown = 180;
+                    player.hitCooldown = 120;
                 player.health -= damage;
                 }
 
@@ -187,6 +190,8 @@ namespace RobotBosses
 
         public void endOfTickCode()
         {
+
+            playerHealthBar.setRecWidth(player.health * 2);
             if(player.hitCooldown > 0)
             {
                 player.hitCooldown--;
@@ -232,11 +237,18 @@ namespace RobotBosses
 
                 if (shouldAddShadow)
                 {
+                    if (currentShadowPathNum < 5)
+                    {
+                        shadowPathList.Add(new ShadowPath(ref blankSquare,
+                            new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
 
-                    shadowPathList.Add(new ShadowPath(ref blankSquare,
-                        new Rectangle(pathMaker.getRecX(), pathMaker.getRecY(), pathMaker.getRec().Width, pathMaker.getRec().Height)));
-
-                    currentShadowPathNum += 1;
+                        currentShadowPathNum += 1;
+                    }
+                    else
+                    {
+                        shouldMakeShadowPaths = false;
+                        pathMaker.setRecY(-playerWidth);
+                    }
                 }
 
                 if (currentShadowPathNum < 3)
@@ -356,7 +368,22 @@ namespace RobotBosses
 
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
             shadowBoss.drawCharacter(spriteBatch, Color.Black, true);
+
+            if(player.hitCooldown > 0)
+            {
+                if(gameClock % 8 != 0)
+                {
+                    player.drawCharacter(spriteBatch, Color.Red);
+
+                }
+            }
+            else
+            {
             player.drawCharacter(spriteBatch, Color.Red);
+
+            }
+
+
             pathMaker.drawCharacter(spriteBatch, Color.Purple);
 
             for (int i = 0; i < shadowPathList.Count; i++)
@@ -367,7 +394,7 @@ namespace RobotBosses
 
 
 
-
+            playerHealthBar.drawCharacter(spriteBatch, new Color(128, 0, 0), Color.Black);
             spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
             spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
