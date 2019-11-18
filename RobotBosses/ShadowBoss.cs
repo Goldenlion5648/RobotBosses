@@ -11,9 +11,6 @@ namespace RobotBosses
 {
     class ShadowBoss : Enemy
     {
-        Rectangle head;
-        Rectangle body;
-        Rectangle tail;
 
         enum facing
         {
@@ -32,64 +29,39 @@ namespace RobotBosses
 
         public bool hasMovedInTick { get; set; } = false;
 
-        int xHeadDistance = 0;
-        int yHeadDistance = 0;
-
-        int xBodyDistance = 0;
-        int yBodyDistance = 0;
-
-        int xTailDistance = 0;
-        int yTailDistance = 0;
+        Player player;
 
         List<SnakePart> bodyPartList = new List<SnakePart>();
         public int numParts { get; set; } = 14;
+        public int damageToInflict { get; set; } = 30;
         //int numParts = 14;
         int partDimension = 50;
 
         public bool hasStartedAcrossAttack { get; set; }
         public bool shouldDoAcrossAttack { get; set; }
 
-        public ShadowBoss(ref Texture2D tex, Rectangle rectangle) : base(ref tex, rectangle)
+        public ShadowBoss(ref Texture2D tex, Rectangle rectangle, ref Player player)
         {
             this.rec = rectangle;
             this.texture = tex;
             this.health = 150;
             this.speed = 10;
-            //if (rectangle.Width > rectangle.Height)
-            //{
-            //    widthLarger = true;
-            //    this.head = new Rectangle(rectangle.X, rectangle.Y + 10, rectangle.Width / 3, rectangle.Height);
-            //    this.body = new Rectangle(rectangle.X + rectangle.Width / 3, rectangle.Y - 5, rectangle.Width / 3, rectangle.Height);
-            //    this.tail = new Rectangle(rectangle.X + (rectangle.Width * 2) / 3, rectangle.Y + 10, rectangle.Width / 3, rectangle.Height);
-
-            //}
-            //else
-            //{
-            //    widthLarger = false;
-
-            //    this.head = new Rectangle(rectangle.X + 10, rectangle.Y, rectangle.Width, rectangle.Height / 3);
-            //    this.body = new Rectangle(rectangle.X - 5, rectangle.Y + rectangle.Height / 3, rectangle.Width, rectangle.Height / 3);
-            //    this.tail = new Rectangle(rectangle.X + 10, rectangle.Y + (rectangle.Height * 2) / 3, rectangle.Width, rectangle.Height / 3);
-
-            //}
+            this.player = player;
 
             for (int i = 0; i < numParts; i++)
             {
                 bodyPartList.Add(new SnakePart(new Rectangle(rectangle.X + partDimension * i, rectangle.Y, partDimension, partDimension)));
             }
 
-            //parts.Add(head);
-            //parts.Add(body);
-            //parts.Add(tail);
         }
 
-        public ShadowBoss(Texture2D tex, Rectangle head, Rectangle body, Rectangle tail) : base()
-        {
-            this.texture = tex;
-            this.head = head;
-            this.body = body;
-            this.tail = tail;
-        }
+        //public ShadowBoss(Texture2D tex, Rectangle head, Rectangle body, Rectangle tail) : base()
+        //{
+        //    this.texture = tex;
+        //    this.head = head;
+        //    this.body = body;
+        //    this.tail = tail;
+        //}
 
         public SnakePart getPart(int index)
         {
@@ -121,7 +93,27 @@ namespace RobotBosses
 
             for (int i = numParts - 2; i >= 0; i--)
             {
-                bodyPartList[i].incrementRecY( - (int)Math.Pow(numParts - i, 1.9) / 2);
+                for (int j = 0; j < (int)Math.Pow(numParts - i, 1.9) / 2; j++)
+                {
+                    bodyPartList[i].incrementRecY(-1);
+                    inflictDamageToPlayer();
+
+                }
+            }
+        }
+
+        public void inflictDamageToPlayer()
+        {
+            for (int i = numParts - 1; i >= 0; i--)
+            {
+                if (bodyPartList[i].getRec().Intersects(player.getRec()))
+                {
+                    if (player.hitCooldown == 0)
+                    {
+                        player.hitCooldown = 120;
+                        player.health -= damageToInflict;
+                    }
+                }
             }
         }
 
@@ -227,44 +219,6 @@ namespace RobotBosses
             }
         }
 
-        public void animate()
-        {
-            //if(widthLarger)
-            //{
-            //    for (int i = 0; i < parts.Count; i++)
-            //    {
-
-
-            //        if (parts[i].Center.Y < rec.Top)
-            //        {
-            //            parts[i].Y += 10;
-            //        }
-            //        else
-            //        {
-            //            parts[i].Y -= 10;
-            //        }
-
-            //    }
-            //}
-            //else
-            //{
-            //    for (int i = 0; i < parts.Length; i++)
-            //    {
-
-
-            //        if (parts[i].Center.X < rec.Left)
-            //        {
-            //            parts[i].X += 10;
-            //        }
-            //        else
-            //        {
-            //            parts[i].X -= 10;
-            //        }
-
-            //    }
-            //}
-        }
-
         public void acrossScreenAttack()
         {
             if (hasStartedAcrossAttack == false)
@@ -272,7 +226,7 @@ namespace RobotBosses
                 if (rec.Bottom + 50 > 0)
                 {
                     this.rec.Y -= 1;
-                    adjustSections();
+                    //adjustSections();
                 }
                 else
                 {
@@ -294,105 +248,7 @@ namespace RobotBosses
 
         public void rotateToUpper(int gameClock)
         {
-            //head.X = body.X;
-            //head.Y = body.Top - head.Height;
-            //head.Height = (rec.Width / 3);
-            //head.Width = rec.Height;
-
-
-            //body.X += 20;
-            //body.Y = head.Bottom;
-            //body.Height = (rec.Width / 3);
-            //body.Width = rec.Height;
-
-            //tail.X = body.X - 30;
-            //tail.Y = body.Bottom;
-            //tail.Height = (rec.Width / 3);
-            //tail.Width = rec.Height;
-
-
-            if (hasStartedRotating == false)
-            {
-                if (rec.Contains(head.Center) == false ||
-                    rec.Contains(body.Center) == false ||
-                    rec.Contains(tail.Center) == false)
-                {
-                    head.X = rec.X;
-                    head.Y = rec.Y;
-                }
-                int temp = rec.Height;
-
-                //int tempPos = rec.Center.X - (rec.Width / 2);
-                rec.Height = rec.Width;
-                rec.Width = temp;
-                //rec.X = head.Center.X - (rec.Width / 2);
-                //rec.Y = head.Y;
-                isFinishedRotating = false;
-                hasStartedRotating = true;
-            }
-
-            if (isFinishedRotating == false)
-            {
-                if (xTailDistance == 0)
-                {
-
-                    //xHeadDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
-                    //yHeadDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
-
-                    //xBodyDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
-                    //yBodyDistance = (int)Math.Pow(tail.Center.X - (rec.Center.X), 2);
-
-                    xTailDistance = Math.Abs(tail.Center.X - (rec.Center.X));
-                    yTailDistance = Math.Abs(tail.Center.Y - (rec.Y + rec.Height * 2 / 3));
-                }
-
-                //if (gameClock % 2 == 0)
-                //{
-                if (rec.Contains(tail.Center) == false)
-                {
-                    tail.X -= xTailDistance / 20;
-                    tail.Y += yTailDistance / 20;
-                }
-                //}
-            }
-
-
-
-
-            //rec.X -= 40;
-
-            widthLarger = false;
-        }
-
-        public void adjustSections()
-        {
-            if (widthLarger == true)
-            {
-                head.X = rec.X;
-                body.X = rec.X + rec.Width / 3;
-                tail.X = rec.X + rec.Width * 2 / 3;
-            }
-            else
-            {
-                head.Y = rec.Y + 10;
-                body.Y = rec.Y - 5 + rec.Height / 3;
-                tail.Y = rec.Y + 10 + rec.Height * 2 / 3;
-            }
-
-        }
-
-        public override void drawCharacter(SpriteBatch sb)
-        {
-            sb.Draw(texture, head, Color.White);
-            sb.Draw(texture, body, Color.White);
-            sb.Draw(texture, tail, Color.White);
-        }
-
-        public override void drawCharacter(SpriteBatch sb, Color color)
-        {
-            sb.Draw(texture, head, color);
-            sb.Draw(texture, body, color);
-            sb.Draw(texture, tail, color);
+           
         }
 
         public void drawCharacter(SpriteBatch sb, Color color, bool showBody)

@@ -29,9 +29,6 @@ namespace RobotBosses
         bool shouldMakeShadowPaths = false;
         bool shouldAddShadow = true;
 
-
-
-
         int gameClock = 1;
 
         List<ShadowPath> shadowPathList = new List<ShadowPath>();
@@ -45,7 +42,7 @@ namespace RobotBosses
         int screenWidth = 1080;
         int screenHeight = 720;
 
-        int playerHeight = 100;
+        int playerHeight = 5;
         int playerWidth = 60;
 
         int currentShadowPathNum = -1;
@@ -111,7 +108,7 @@ namespace RobotBosses
             pathMaker.speed = 2;
 
             shadowBoss = new ShadowBoss(ref blankSquare,
-                new Rectangle(400, screenHeight / 2, playerWidth * 4, playerHeight / 3));
+                new Rectangle(400, screenHeight / 2, playerWidth * 4, playerHeight / 3), ref player);
 
             // TODO: use this.Content to load your game content here
         }
@@ -161,14 +158,14 @@ namespace RobotBosses
         public void shadowBossLevel()
         {
             userControls();
-            collideWithPlayer(30, shadowBoss.getRec());
+            //collideWithPlayer(30, shadowBoss.getRec());
 
             if (shadowBoss.shouldDoAcrossAttack)
             {
                 for (int i = 0; i < 4; i++)
                 {
                     shadowBoss.acrossScreenAttack();
-                    collideWithPlayer(30, shadowBoss.getRec());
+                    //collideWithPlayer(30, shadowBoss.getRec());
 
 
                 }
@@ -198,11 +195,16 @@ namespace RobotBosses
         public void endOfTickCode()
         {
 
-            playerHealthBar.setRecWidth(player.health * 2);
             if (player.hitCooldown > 0)
             {
                 player.hitCooldown--;
             }
+
+            //for (int j = 0; j < shadowBoss.numParts; j++)
+            //{
+            //    collideWithPlayer(shadowBoss.damageToInflict, shadowBoss.getPartRec(j));
+            //}
+            playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
         }
 
