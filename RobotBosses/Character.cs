@@ -16,6 +16,8 @@ namespace RobotBosses
         public Rectangle rec;
         public int health { get; set; }
         public int speed { get; set; } = 5;
+        public int originalX { get; set; } = 5;
+        public int originalY { get; set; } = 5;
 
 
         //public Rectangle rec2 { get { return rec2}; set; }

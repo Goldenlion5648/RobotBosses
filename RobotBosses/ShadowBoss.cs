@@ -17,7 +17,7 @@ namespace RobotBosses
 
         enum facing
         {
-            up =1, right, down, left
+            up = 1, right, down, left
         }
 
         facing direction = facing.left;
@@ -40,6 +40,10 @@ namespace RobotBosses
         int xTailDistance = 0;
         int yTailDistance = 0;
 
+        List<Rectangle> bodyPartList = new List<Rectangle>();
+        int numParts = 10;
+        int partDimension = 70;
+
         public bool hasStartedAcrossAttack { get; set; }
         public bool shouldDoAcrossAttack { get; set; }
 
@@ -48,7 +52,7 @@ namespace RobotBosses
             this.rec = rectangle;
             this.texture = tex;
             this.health = 150;
-            
+
             if (rectangle.Width > rectangle.Height)
             {
                 widthLarger = true;
@@ -67,17 +71,56 @@ namespace RobotBosses
 
             }
 
+            for (int i = 0; i < numParts; i++)
+            {
+                bodyPartList.Add(new Rectangle(rectangle.X + partDimension * i, rectangle.Y, partDimension, partDimension));
+            }
+
             //parts.Add(head);
             //parts.Add(body);
             //parts.Add(tail);
         }
 
-        public ShadowBoss(Texture2D tex, Rectangle head, Rectangle body, Rectangle tail) :  base()
+        public ShadowBoss(Texture2D tex, Rectangle head, Rectangle body, Rectangle tail) : base()
         {
             this.texture = tex;
             this.head = head;
-            this.body= body;
+            this.body = body;
             this.tail = tail;
+        }
+
+        public void moveUp()
+        {
+
+            for (int i = numParts - 2; i >= 0; i--)
+            {
+                bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[i].Y - (int)Math.Pow(numParts - i, 1.7) / 3,
+                    bodyPartList[i].Width, bodyPartList[i].Height);
+            }
+        }
+
+        public void moveDown()
+        {
+
+            for (int i = numParts - 2; i >= 0; i--)
+            {
+                bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[i].Y  + (int)Math.Pow(numParts - i, 1.7) / 3,
+                    bodyPartList[i].Width, bodyPartList[i].Height);
+            }
+        }
+
+        public void flailAttack()
+        {
+
+        }
+
+        public void resetToStraight()
+        {
+            for (int i = numParts - 2; i >= 0; i--)
+            {
+                bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[numParts - 1].Y,
+                    bodyPartList[i].Width, bodyPartList[i].Height);
+            }
         }
 
         public void animate()
@@ -120,9 +163,9 @@ namespace RobotBosses
 
         public void acrossScreenAttack()
         {
-            if(hasStartedAcrossAttack == false)
+            if (hasStartedAcrossAttack == false)
             {
-                if(rec.Bottom + 50 > 0)
+                if (rec.Bottom + 50 > 0)
                 {
                     this.rec.Y -= 1;
                     adjustSections();
@@ -166,7 +209,7 @@ namespace RobotBosses
 
             if (hasStartedRotating == false)
             {
-                if(rec.Contains(head.Center) == false || 
+                if (rec.Contains(head.Center) == false ||
                     rec.Contains(body.Center) == false ||
                     rec.Contains(tail.Center) == false)
                 {
@@ -201,11 +244,11 @@ namespace RobotBosses
 
                 //if (gameClock % 2 == 0)
                 //{
-                    if (rec.Contains(tail.Center) == false)
-                    {
-                        tail.X -= xTailDistance / 20;
-                        tail.Y += yTailDistance / 20;
-                    }
+                if (rec.Contains(tail.Center) == false)
+                {
+                    tail.X -= xTailDistance / 20;
+                    tail.Y += yTailDistance / 20;
+                }
                 //}
             }
 
@@ -231,7 +274,7 @@ namespace RobotBosses
                 body.Y = rec.Y - 5 + rec.Height / 3;
                 tail.Y = rec.Y + 10 + rec.Height * 2 / 3;
             }
-            
+
         }
 
         public override void drawCharacter(SpriteBatch sb)
@@ -252,10 +295,14 @@ namespace RobotBosses
         {
             if (showBody)
             {
-                sb.Draw(texture, head, Color.Red);
-                sb.Draw(texture, body, Color.Green);
-                sb.Draw(texture, tail, Color.Blue);
-                sb.Draw(texture, rec, Color.White);
+                //sb.Draw(texture, head, Color.Red);
+                //sb.Draw(texture, body, Color.Green);
+                //sb.Draw(texture, tail, Color.Blue);
+                for (int i = 0; i < numParts; i++)
+                {
+                    sb.Draw(texture, bodyPartList[i], new Color(i * 10, i * 5, i));
+                }
+                //sb.Draw(texture, rec, Color.White);
             }
         }
 

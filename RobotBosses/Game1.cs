@@ -107,7 +107,7 @@ namespace RobotBosses
             pathMaker.speed = 2;
 
             shadowBoss = new ShadowBoss(ref blankSquare,
-                new Rectangle(600, 200, playerWidth * 4, playerHeight / 3));
+                new Rectangle(400, screenHeight / 2, playerWidth * 4, playerHeight / 3));
 
             // TODO: use this.Content to load your game content here
         }
@@ -251,6 +251,9 @@ namespace RobotBosses
                         shouldMakeShadowPaths = false;
                         pathMaker.setRecY(-playerWidth);
                         shadowPathList.Clear();
+                        currentShadowPathNum = -1;
+                        shouldAddShadow = false;
+                        
                     }
                 }
 
@@ -310,9 +313,24 @@ namespace RobotBosses
         public void userControls()
         {
             //debug keybinds
-            if (kb.IsKeyDown(Keys.L) && oldkb.IsKeyUp(Keys.L))
+            if (kb.IsKeyDown(Keys.U) && oldkb.IsKeyUp(Keys.U))
             {
                 shadowBoss.shouldDoAcrossAttack = true;
+            }
+
+            if (kb.IsKeyDown(Keys.I))
+            {
+                shadowBoss.moveUp();
+            }
+
+            if (kb.IsKeyDown(Keys.K))
+            {
+                shadowBoss.moveDown();
+            }
+
+            if (kb.IsKeyDown(Keys.O))
+            {
+                shadowBoss.resetToStraight();
             }
 
             if (kb.IsKeyDown(Keys.R))
