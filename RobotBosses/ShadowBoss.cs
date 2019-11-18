@@ -28,6 +28,10 @@ namespace RobotBosses
         bool hasStartedRotating = false;
         bool isFinishedRotating = false;
 
+        //bool hasMovedInTick = false;
+
+        public bool hasMovedInTick { get; set; } = false;
+
         int xHeadDistance = 0;
         int yHeadDistance = 0;
 
@@ -38,8 +42,9 @@ namespace RobotBosses
         int yTailDistance = 0;
 
         List<SnakePart> bodyPartList = new List<SnakePart>();
-        int numParts = 10;
-        int partDimension = 70;
+        public int numParts { get; set; } = 14;
+        //int numParts = 14;
+        int partDimension = 50;
 
         public bool hasStartedAcrossAttack { get; set; }
         public bool shouldDoAcrossAttack { get; set; }
@@ -49,7 +54,7 @@ namespace RobotBosses
             this.rec = rectangle;
             this.texture = tex;
             this.health = 150;
-
+            this.speed = 10;
             //if (rectangle.Width > rectangle.Height)
             //{
             //    widthLarger = true;
@@ -106,12 +111,17 @@ namespace RobotBosses
             bodyPartList[index].setRecY(y);
         }
 
+        public void circleSpin()
+        {
+
+        }
+
         public void turnUp()
         {
 
             for (int i = numParts - 2; i >= 0; i--)
             {
-                bodyPartList[i].incrementRecY( - (int)Math.Pow(numParts - i, 1.7) / 3);
+                bodyPartList[i].incrementRecY( - (int)Math.Pow(numParts - i, 1.9) / 2);
             }
         }
 
@@ -120,7 +130,7 @@ namespace RobotBosses
 
             for (int i = numParts - 2; i >= 0; i--)
             {
-                bodyPartList[i].incrementRecY((int)Math.Pow(numParts - i, 1.7) / 3);
+                bodyPartList[i].incrementRecY((int)Math.Pow(numParts - i, 1.9) / 2);
             }
         }
 
@@ -137,13 +147,37 @@ namespace RobotBosses
             else
                 xDirection = 0;
 
-            for (int i = 0; i < speed; i++)
+            //for (int i = 0; i < speed; i++)
+            //{
+            //    for (int j = 0; j < numParts; j++)
+            //    {
+            //        if (bodyPartList[j].getRec().X != destination.X)
+            //        {
+            //            bodyPartList[j].incrementRecX(xDirection);
+            //        }
+            //    }
+            //}
+
+            for (int j = numParts - 1; j >= 1; j--)
             {
-                if (bodyPartList[0].getRec().X != destination.X)
+                //for (int i = 0; i < speed; i++)
+                //{
+                    bodyPartList[j].setRecX(bodyPartList[j - 1].getRecX() + bodyPartList[j - 1].getRec().Width - 5);
+                //}
+            }
+            if (hasMovedInTick == false)
+            {
+                for (int i = 0; i < speed; i++)
                 {
-                    bodyPartList[0].incrementRecX(xDirection);
+
+                    if (bodyPartList[0].getRec().X != destination.X)
+                    {
+                        bodyPartList[0].incrementRecX(xDirection);
+                    }
+
                 }
             }
+
 
             int yDirection = -1;
             if ((destination.Y - bodyPartList[0].getRecY()) < 0)
@@ -154,19 +188,24 @@ namespace RobotBosses
                 yDirection = 0;
 
 
-            for (int i = 0; i < speed; i++)
+            for (int j = numParts - 1; j >= 1; j--)
             {
-                if (bodyPartList[0].getRecY() != destination.Y)
-                {
-                    bodyPartList[0].incrementRecY(yDirection);
-                }
+                //for (int i = 0; i < speed; i++)
+                //{
+                    bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - yDirection * 4);
+                //}
             }
-
-            //for (int i = 1; i < numParts; i++)
-            //{
-            //    bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[i].Y + (int)Math.Pow(numParts - i, 1.7) / 3,
-            //        bodyPartList[i].Width, bodyPartList[i].Height);
-            //}
+            if (hasMovedInTick == false)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    if (bodyPartList[0].getRec().Y != destination.Y)
+                    {
+                        bodyPartList[0].incrementRecY(yDirection);
+                    }
+                }
+                hasMovedInTick = true;
+            }
         }
 
         public void flailAttack()

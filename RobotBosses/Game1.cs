@@ -22,6 +22,10 @@ namespace RobotBosses
         SpriteFont debugFont;
 
         KeyboardState kb, oldkb;
+
+        MouseState ms;
+        Point mousePos;
+
         bool shouldMakeShadowPaths = false;
         bool shouldAddShadow = true;
 
@@ -129,6 +133,8 @@ namespace RobotBosses
         protected override void Update(GameTime gameTime)
         {
             kb = Keyboard.GetState();
+            ms = Mouse.GetState();
+            mousePos = new Point(ms.X, ms.Y);
             if (kb.IsKeyDown(Keys.LeftShift) && kb.IsKeyDown(Keys.F5))
                 Exit();
             switch (state)
@@ -313,11 +319,11 @@ namespace RobotBosses
         public void userControls()
         {
             //debug keybinds
-            if (kb.IsKeyDown(Keys.U) && oldkb.IsKeyUp(Keys.U))
-            {
-                shadowBoss.shouldDoAcrossAttack = true;
+            //if (kb.IsKeyDown(Keys.U) && oldkb.IsKeyUp(Keys.U))
+            //{
+            //    shadowBoss.shouldDoAcrossAttack = true;
                 
-            }
+            //}
 
             if (kb.IsKeyDown(Keys.I))
             {
@@ -326,7 +332,17 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.H))
             {
-                shadowBoss.moveToPoint(new Point(50,  200));
+                shadowBoss.hasMovedInTick = false;
+                for (int i = 0; i < shadowBoss.speed; i++)
+                {
+
+                shadowBoss.moveToPoint(mousePos);
+                    for (int j = 0; j < shadowBoss.numParts; j++)
+                    {
+                        collideWithPlayer(30, shadowBoss.getPartRec(j));
+                    }
+                    //collideWithPlayer(30, shadowBoss.getRec());
+                }
             }
 
             if (kb.IsKeyDown(Keys.K))
@@ -432,6 +448,7 @@ namespace RobotBosses
 
 
             playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30), Color.Black);
+            spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
             spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
             spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
