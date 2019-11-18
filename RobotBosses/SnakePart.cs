@@ -10,10 +10,12 @@ using Microsoft.Xna.Framework.Input;
 
 namespace RobotBosses
 {
-    class Enemy : Character
+    class SnakePart : Character
     {
 
-        public Enemy(ref Texture2D tex, Rectangle rectangle) : base(ref tex, rectangle)
+        List<Point> cornerList = new List<Point>();
+
+        public SnakePart(ref Texture2D tex, Rectangle rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
@@ -22,9 +24,10 @@ namespace RobotBosses
             originalY = rectangle.Y;
         }
 
-        public Enemy()
+        public SnakePart(Rectangle rectangle)
         {
-
+            this.rec = rectangle;
+            
         }
 
     }

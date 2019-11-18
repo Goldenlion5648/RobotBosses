@@ -249,7 +249,7 @@ namespace RobotBosses
                     {
                         //clear shadow paths
                         shouldMakeShadowPaths = false;
-                        pathMaker.setRecY(-playerWidth);
+                        pathMaker.resetPos();
                         shadowPathList.Clear();
                         currentShadowPathNum = -1;
                         shouldAddShadow = false;
@@ -316,21 +316,27 @@ namespace RobotBosses
             if (kb.IsKeyDown(Keys.U) && oldkb.IsKeyUp(Keys.U))
             {
                 shadowBoss.shouldDoAcrossAttack = true;
+                
             }
 
             if (kb.IsKeyDown(Keys.I))
             {
-                shadowBoss.moveUp();
+                shadowBoss.turnUp();
+            }
+
+            if (kb.IsKeyDown(Keys.H))
+            {
+                shadowBoss.moveToPoint(new Point(50,  200));
             }
 
             if (kb.IsKeyDown(Keys.K))
             {
-                shadowBoss.moveDown();
+                shadowBoss.turnDown();
             }
 
             if (kb.IsKeyDown(Keys.O))
             {
-                shadowBoss.resetToStraight();
+                shadowBoss.resetPosition();
             }
 
             if (kb.IsKeyDown(Keys.R))
@@ -429,6 +435,8 @@ namespace RobotBosses
             spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
             spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
+            spriteBatch.DrawString(debugFont, "bossHeadX: " + shadowBoss.getPartRec(0).X + "bossHeadY: " + shadowBoss.getPartRec(0).Y,
+                new Vector2(100, screenHeight - 40), Color.Green);
 
 
 

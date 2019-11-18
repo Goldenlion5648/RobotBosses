@@ -22,9 +22,6 @@ namespace RobotBosses
 
         facing direction = facing.left;
 
-
-
-
         //List<Rectangle> parts = new List<Rectangle>();
 
         bool widthLarger;
@@ -40,7 +37,7 @@ namespace RobotBosses
         int xTailDistance = 0;
         int yTailDistance = 0;
 
-        List<Rectangle> bodyPartList = new List<Rectangle>();
+        List<SnakePart> bodyPartList = new List<SnakePart>();
         int numParts = 10;
         int partDimension = 70;
 
@@ -53,27 +50,27 @@ namespace RobotBosses
             this.texture = tex;
             this.health = 150;
 
-            if (rectangle.Width > rectangle.Height)
-            {
-                widthLarger = true;
-                this.head = new Rectangle(rectangle.X, rectangle.Y + 10, rectangle.Width / 3, rectangle.Height);
-                this.body = new Rectangle(rectangle.X + rectangle.Width / 3, rectangle.Y - 5, rectangle.Width / 3, rectangle.Height);
-                this.tail = new Rectangle(rectangle.X + (rectangle.Width * 2) / 3, rectangle.Y + 10, rectangle.Width / 3, rectangle.Height);
+            //if (rectangle.Width > rectangle.Height)
+            //{
+            //    widthLarger = true;
+            //    this.head = new Rectangle(rectangle.X, rectangle.Y + 10, rectangle.Width / 3, rectangle.Height);
+            //    this.body = new Rectangle(rectangle.X + rectangle.Width / 3, rectangle.Y - 5, rectangle.Width / 3, rectangle.Height);
+            //    this.tail = new Rectangle(rectangle.X + (rectangle.Width * 2) / 3, rectangle.Y + 10, rectangle.Width / 3, rectangle.Height);
 
-            }
-            else
-            {
-                widthLarger = false;
+            //}
+            //else
+            //{
+            //    widthLarger = false;
 
-                this.head = new Rectangle(rectangle.X + 10, rectangle.Y, rectangle.Width, rectangle.Height / 3);
-                this.body = new Rectangle(rectangle.X - 5, rectangle.Y + rectangle.Height / 3, rectangle.Width, rectangle.Height / 3);
-                this.tail = new Rectangle(rectangle.X + 10, rectangle.Y + (rectangle.Height * 2) / 3, rectangle.Width, rectangle.Height / 3);
+            //    this.head = new Rectangle(rectangle.X + 10, rectangle.Y, rectangle.Width, rectangle.Height / 3);
+            //    this.body = new Rectangle(rectangle.X - 5, rectangle.Y + rectangle.Height / 3, rectangle.Width, rectangle.Height / 3);
+            //    this.tail = new Rectangle(rectangle.X + 10, rectangle.Y + (rectangle.Height * 2) / 3, rectangle.Width, rectangle.Height / 3);
 
-            }
+            //}
 
             for (int i = 0; i < numParts; i++)
             {
-                bodyPartList.Add(new Rectangle(rectangle.X + partDimension * i, rectangle.Y, partDimension, partDimension));
+                bodyPartList.Add(new SnakePart(new Rectangle(rectangle.X + partDimension * i, rectangle.Y, partDimension, partDimension)));
             }
 
             //parts.Add(head);
@@ -89,24 +86,87 @@ namespace RobotBosses
             this.tail = tail;
         }
 
-        public void moveUp()
+        public SnakePart getPart(int index)
+        {
+            return bodyPartList[index];
+        }
+
+        public Rectangle getPartRec(int index)
+        {
+            return bodyPartList[index].getRec();
+        }
+
+        public void setPartX(int index, int x)
+        {
+            bodyPartList[index].setRecX(x);
+        }
+
+        public void setPartY(int index, int y)
+        {
+            bodyPartList[index].setRecY(y);
+        }
+
+        public void turnUp()
         {
 
             for (int i = numParts - 2; i >= 0; i--)
             {
-                bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[i].Y - (int)Math.Pow(numParts - i, 1.7) / 3,
-                    bodyPartList[i].Width, bodyPartList[i].Height);
+                bodyPartList[i].incrementRecY( - (int)Math.Pow(numParts - i, 1.7) / 3);
             }
         }
 
-        public void moveDown()
+        public void turnDown()
         {
 
             for (int i = numParts - 2; i >= 0; i--)
             {
-                bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[i].Y  + (int)Math.Pow(numParts - i, 1.7) / 3,
-                    bodyPartList[i].Width, bodyPartList[i].Height);
+                bodyPartList[i].incrementRecY((int)Math.Pow(numParts - i, 1.7) / 3);
             }
+        }
+
+        public void moveToPoint(Point destination)
+        {
+            //resetToStraight();
+
+            int xDirection = -1;
+
+            if ((destination.X - bodyPartList[0].getRecX()) < 0)
+                xDirection = -1;
+            else if ((destination.X - bodyPartList[0].getRecX()) > 0)
+                xDirection = 1;
+            else
+                xDirection = 0;
+
+            for (int i = 0; i < speed; i++)
+            {
+                if (bodyPartList[0].getRec().X != destination.X)
+                {
+                    bodyPartList[0].incrementRecX(xDirection);
+                }
+            }
+
+            int yDirection = -1;
+            if ((destination.Y - bodyPartList[0].getRecY()) < 0)
+                yDirection = -1;
+            else if ((destination.Y - bodyPartList[0].getRecY()) > 0)
+                yDirection = 1;
+            else
+                yDirection = 0;
+
+
+            for (int i = 0; i < speed; i++)
+            {
+                if (bodyPartList[0].getRecY() != destination.Y)
+                {
+                    bodyPartList[0].incrementRecY(yDirection);
+                }
+            }
+
+            //for (int i = 1; i < numParts; i++)
+            //{
+            //    bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[i].Y + (int)Math.Pow(numParts - i, 1.7) / 3,
+            //        bodyPartList[i].Width, bodyPartList[i].Height);
+            //}
         }
 
         public void flailAttack()
@@ -114,12 +174,17 @@ namespace RobotBosses
 
         }
 
-        public void resetToStraight()
+        public void resetPosition()
         {
-            for (int i = numParts - 2; i >= 0; i--)
+            //for (int i = numParts - 2; i >= 0; i--)
+            //{
+            //    bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[numParts - 1].Y,
+            //        bodyPartList[i].Width, bodyPartList[i].Height);
+            //}
+
+            for (int i = 0; i < numParts; i++)
             {
-                bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[numParts - 1].Y,
-                    bodyPartList[i].Width, bodyPartList[i].Height);
+                bodyPartList[i] = (new SnakePart(new Rectangle(rec.X + partDimension * i, rec.Y, partDimension, partDimension)));
             }
         }
 
@@ -298,11 +363,11 @@ namespace RobotBosses
                 //sb.Draw(texture, head, Color.Red);
                 //sb.Draw(texture, body, Color.Green);
                 //sb.Draw(texture, tail, Color.Blue);
+                sb.Draw(texture, rec, Color.White);
                 for (int i = 0; i < numParts; i++)
                 {
-                    sb.Draw(texture, bodyPartList[i], new Color(i * 10, i * 5, i));
+                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * 5, i));
                 }
-                //sb.Draw(texture, rec, Color.White);
             }
         }
 

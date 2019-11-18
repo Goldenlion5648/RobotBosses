@@ -94,6 +94,12 @@ namespace RobotBosses
             rec.Y += amount;
         }
 
+        public void resetPos()
+        {
+            rec.X = originalX;
+            rec.Y = originalY;
+        }
+
 
         public virtual void drawCharacter(SpriteBatch sb)
         {
