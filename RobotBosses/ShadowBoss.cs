@@ -154,7 +154,7 @@ namespace RobotBosses
             {
                 //for (int i = 0; i < speed; i++)
                 //{
-                    bodyPartList[j].setRecX(bodyPartList[j - 1].getRecX() + bodyPartList[j - 1].getRec().Width - 5);
+                bodyPartList[j].setRecX(bodyPartList[j - 1].getRecX() + bodyPartList[j - 1].getRec().Width - 5);
                 //}
             }
             if (hasMovedInTick == false)
@@ -184,7 +184,7 @@ namespace RobotBosses
             {
                 //for (int i = 0; i < speed; i++)
                 //{
-                    bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - yDirection * 4);
+                bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - yDirection * 4);
                 //}
             }
             if (hasMovedInTick == false)
@@ -248,23 +248,22 @@ namespace RobotBosses
 
         public void rotateToUpper(int gameClock)
         {
-           
+
         }
 
-        public void drawCharacter(SpriteBatch sb, Color color, bool showBody)
+        public void drawCharacter(SpriteBatch sb, Color color)
         {
-            if (showBody)
+
+            //sb.Draw(texture, head, Color.Red);
+            //sb.Draw(texture, body, Color.Green);
+            //sb.Draw(texture, tail, Color.Blue);
+            sb.Draw(texture, rec, Color.White);
+            for (int i = 0; i < numParts; i++)
             {
-                //sb.Draw(texture, head, Color.Red);
-                //sb.Draw(texture, body, Color.Green);
-                //sb.Draw(texture, tail, Color.Blue);
-                sb.Draw(texture, rec, Color.White);
-                for (int i = 0; i < numParts; i++)
-                {
-                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * 5, i));
-                }
+                sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * 5, i));
             }
         }
+
 
     }
 }

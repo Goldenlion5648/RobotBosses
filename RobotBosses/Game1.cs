@@ -422,7 +422,7 @@ namespace RobotBosses
 
 
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
-            shadowBoss.drawCharacter(spriteBatch, Color.Black, true);
+            shadowBoss.drawCharacter(spriteBatch, Color.Black);
 
             if (player.hitCooldown > 0)
             {
