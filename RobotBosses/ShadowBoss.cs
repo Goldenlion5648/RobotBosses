@@ -12,12 +12,12 @@ namespace RobotBosses
     class ShadowBoss : Enemy
     {
 
-        enum facing
-        {
-            up = 1, right, down, left
-        }
+        //enum facing
+        //{
+        //    up = 1, right, down, left
+        //}
 
-        facing direction = facing.left;
+        //facing direction = facing.left;
 
         //List<Rectangle> parts = new List<Rectangle>();
 
@@ -32,20 +32,23 @@ namespace RobotBosses
         Player player;
 
         List<SnakePart> bodyPartList = new List<SnakePart>();
-        public int numParts { get; set; } = 14;
+        public int numParts { get; set; } = 16;
         public int damageToInflict { get; set; } = 30;
-        //int numParts = 14;
-        int partDimension = 50;
+        //int numParts = 10;
+        int partDimension = 40;
 
         public bool hasStartedAcrossAttack { get; set; }
         public bool shouldDoAcrossAttack { get; set; }
+
+        private int currentYPart = 1;
+        private bool isStraightened = true;
 
         public ShadowBoss(ref Texture2D tex, Rectangle rectangle, ref Player player)
         {
             this.rec = rectangle;
             this.texture = tex;
             this.health = 150;
-            this.speed = 10;
+            this.speed = 6;
             this.player = player;
 
             for (int i = 0; i < numParts; i++)
@@ -100,6 +103,22 @@ namespace RobotBosses
 
                 }
             }
+            isStraightened = false;
+        }
+        
+        public void turnDown()
+        {
+
+            for (int i = numParts - 2; i >= 0; i--)
+            {
+                for (int j = 0; j < (int)Math.Pow(numParts - i, 1.9) / 2; j++)
+                {
+                    bodyPartList[i].incrementRecY(1);
+                    inflictDamageToPlayer();
+
+                }
+            }
+            isStraightened = false;
         }
 
         public void inflictDamageToPlayer()
@@ -117,15 +136,6 @@ namespace RobotBosses
             }
         }
 
-        public void turnDown()
-        {
-
-            for (int i = numParts - 2; i >= 0; i--)
-            {
-                bodyPartList[i].incrementRecY((int)Math.Pow(numParts - i, 1.9) / 2);
-            }
-        }
-
         public void moveToPoint(Point destination)
         {
             //resetToStraight();
@@ -139,23 +149,13 @@ namespace RobotBosses
             else
                 xDirection = 0;
 
-            //for (int i = 0; i < speed; i++)
-            //{
-            //    for (int j = 0; j < numParts; j++)
-            //    {
-            //        if (bodyPartList[j].getRec().X != destination.X)
-            //        {
-            //            bodyPartList[j].incrementRecX(xDirection);
-            //        }
-            //    }
-            //}
-
             for (int j = numParts - 1; j >= 1; j--)
             {
-                //for (int i = 0; i < speed; i++)
-                //{
-                bodyPartList[j].setRecX(bodyPartList[j - 1].getRecX() + bodyPartList[j - 1].getRec().Width - 5);
-                //}
+                for (int i = 0; i < speed; i++)
+                {
+                    bodyPartList[j].setRecX(bodyPartList[j - 1].getRecX() + bodyPartList[0].getRec().Width - xDirection * 3);
+                    //bodyPartList[j].incrementRecX(xDirection * 3);
+                }
             }
             if (hasMovedInTick == false)
             {
@@ -179,13 +179,38 @@ namespace RobotBosses
             else
                 yDirection = 0;
 
-
-            for (int j = numParts - 1; j >= 1; j--)
+            if (yDirection == 0 || Math.Abs(destination.Y - bodyPartList[0].getRecY()) < this.speed)
             {
-                //for (int i = 0; i < speed; i++)
-                //{
-                bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - yDirection * 4);
-                //}
+                for (int i = 0; i < 3; i++)
+                {
+
+                if ((destination.Y - bodyPartList[currentYPart].getRecY()) < 0)
+                    yDirection = -1;
+                else if ((destination.Y - bodyPartList[currentYPart].getRecY()) > 0)
+                    yDirection = 1;
+                else
+                    yDirection = 0;
+
+                bodyPartList[currentYPart].incrementRecY(yDirection);
+                }
+                if (currentYPart < numParts)
+                {
+                    currentYPart++;
+                }
+                if(currentYPart == numParts)
+                {
+                    currentYPart = 1;
+                }
+            }
+            else
+            {
+                for (int j = numParts - 1; j >= 1; j--)
+                {
+                    //for (int i = 0; i < speed; i++)
+                    //{
+                    bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - (yDirection * 10));
+                    //}
+                }
             }
             if (hasMovedInTick == false)
             {
@@ -207,16 +232,21 @@ namespace RobotBosses
 
         public void resetPosition()
         {
-            //for (int i = numParts - 2; i >= 0; i--)
-            //{
-            //    bodyPartList[i] = new Rectangle(bodyPartList[i].X, bodyPartList[numParts - 1].Y,
-            //        bodyPartList[i].Width, bodyPartList[i].Height);
-            //}
 
             for (int i = 0; i < numParts; i++)
             {
                 bodyPartList[i] = (new SnakePart(new Rectangle(rec.X + partDimension * i, rec.Y, partDimension, partDimension)));
             }
+        }
+
+        public void straightenInPlace()
+        {
+
+            for (int i = 0; i < numParts; i++)
+            {
+                bodyPartList[i].setRecY(bodyPartList[numParts - 1]);
+            }
+            isStraightened = true;
         }
 
         public void acrossScreenAttack()
@@ -251,7 +281,7 @@ namespace RobotBosses
 
         }
 
-        public void drawCharacter(SpriteBatch sb, Color color)
+        public override void drawCharacter(SpriteBatch sb, Color color)
         {
 
             //sb.Draw(texture, head, Color.Red);

@@ -43,7 +43,7 @@ namespace RobotBosses
         int screenHeight = 720;
 
         int playerHeight = 5;
-        int playerWidth = 60;
+        int playerWidth = 40;
 
         int currentShadowPathNum = -1;
 
@@ -204,6 +204,7 @@ namespace RobotBosses
             //{
             //    collideWithPlayer(shadowBoss.damageToInflict, shadowBoss.getPartRec(j));
             //}
+            shadowBoss.inflictDamageToPlayer();
             playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
         }
@@ -334,16 +335,19 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.H))
             {
-                shadowBoss.hasMovedInTick = false;
-                for (int i = 0; i < shadowBoss.speed; i++)
+                //if (gameClock % 10 == 0)
                 {
-
-                shadowBoss.moveToPoint(mousePos);
-                    for (int j = 0; j < shadowBoss.numParts; j++)
+                    shadowBoss.hasMovedInTick = false;
+                    for (int i = 0; i < shadowBoss.numParts; i++)
                     {
-                        collideWithPlayer(30, shadowBoss.getPartRec(j));
+
+                        shadowBoss.moveToPoint(mousePos);
+                        //for (int j = 0; j < shadowBoss.numParts; j++)
+                        //{
+                        //    collideWithPlayer(30, shadowBoss.getPartRec(j));
+                        //}
+                        //collideWithPlayer(30, shadowBoss.getRec());
                     }
-                    //collideWithPlayer(30, shadowBoss.getRec());
                 }
             }
 
