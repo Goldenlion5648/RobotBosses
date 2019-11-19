@@ -325,12 +325,13 @@ namespace RobotBosses
             //if (kb.IsKeyDown(Keys.U) && oldkb.IsKeyUp(Keys.U))
             //{
             //    shadowBoss.shouldDoAcrossAttack = true;
-                
+
             //}
 
             if (kb.IsKeyDown(Keys.I))
             {
-                shadowBoss.turnUp();
+                if (gameClock % 10 == 0)
+                    shadowBoss.turnUp();
             }
 
             if (kb.IsKeyDown(Keys.H))
@@ -338,7 +339,7 @@ namespace RobotBosses
                 //if (gameClock % 10 == 0)
                 {
                     shadowBoss.hasMovedInTick = false;
-                    for (int i = 0; i < shadowBoss.numParts; i++)
+                    //for (int i = 0; i < shadowBoss.numParts; i++)
                     {
 
                         shadowBoss.moveToPoint(mousePos);
@@ -353,7 +354,8 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.K))
             {
-                shadowBoss.turnDown();
+                if (gameClock % 10 == 0)
+                    shadowBoss.turnDown();
             }
 
             if (kb.IsKeyDown(Keys.O))

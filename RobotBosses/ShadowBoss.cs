@@ -40,8 +40,9 @@ namespace RobotBosses
         public bool hasStartedAcrossAttack { get; set; }
         public bool shouldDoAcrossAttack { get; set; }
 
-        private int currentYPart = 1;
+        private int currentYPart = 0;
         private bool isStraightened = true;
+        private bool hasSetUpMoving = false;
 
         public ShadowBoss(ref Texture2D tex, Rectangle rectangle, ref Player player)
         {
@@ -139,6 +140,32 @@ namespace RobotBosses
         public void moveToPoint(Point destination)
         {
             //resetToStraight();
+            if(hasSetUpMoving == false)
+            {
+                int displacement = 0;
+                if ((destination.Y - bodyPartList[0].getRecY()) < 0)
+                {
+                    turnUp();
+                    displacement = -1;
+
+                }
+                else if ((destination.Y - bodyPartList[0].getRecY()) > 0)
+                { 
+                    turnDown();
+                    displacement = 1;
+
+                }
+                hasSetUpMoving = true;
+                currentYPart = 0;
+                for (int i = 0; i < speed; i++)
+                {
+                    if (bodyPartList[0].getRec().Y != destination.Y)
+                    {
+                        bodyPartList[0].incrementRecY(displacement);
+                    }
+                }
+            }
+
 
             int xDirection = -1;
 
@@ -179,7 +206,7 @@ namespace RobotBosses
             else
                 yDirection = 0;
 
-            if (yDirection == 0 || Math.Abs(destination.Y - bodyPartList[0].getRecY()) < this.speed)
+            //if (yDirection == 0 || Math.Abs(destination.Y - bodyPartList[0].getRecY()) < this.speed)
             {
                 for (int i = 0; i < speed; i++)
                 {
@@ -192,16 +219,28 @@ namespace RobotBosses
 
                     bodyPartList[currentYPart].incrementRecY(yDirection);
                 }
-                //bool isDone = true;
-                //for (int i = 0; i < numParts; i++)
-                //{
-                //    if (bodyPartList[i].getRecY() != destination.X)
-                //    {
-                //        isDone = false;
-                //        break;
-                //    }
-                //    bodyPartList[currentYPart].incrementRecY(yDirection);
-                //}
+                bool isDone = true;
+                for (int i = 0; i < numParts; i++)
+                {
+                    if ((destination.Y - bodyPartList[i].getRecY()) < 0)
+                        yDirection = -1;
+                    else if ((destination.Y - bodyPartList[i].getRecY()) > 0)
+                        yDirection = 1;
+                    else
+                        yDirection = 0;
+
+                    if (bodyPartList[i].getRecY() != destination.Y)
+                    {
+                    bodyPartList[i].incrementRecY(yDirection);
+                        isDone = false;
+                        //break;
+                    }
+                }
+                if(isDone)
+                {
+                    currentYPart = 0;
+                    hasSetUpMoving = false;
+                }
 
                 //if (isDone)
                 //{
@@ -209,26 +248,40 @@ namespace RobotBosses
                 //}
                 //else
                 //{
-                if (currentYPart < numParts)
-                {
-                    currentYPart++;
-                }
-                if (currentYPart == numParts)
-                {
-                    currentYPart = 1;
-                }
+                //if (currentYPart < numParts)
+                //{
+                //    currentYPart++;
+                //}
+                //if (currentYPart == numParts)
+                //{
+                //    currentYPart = 1;
+                //}
                 //}
             }
-            else
+            //else
+            //{
+            //    //yDirection = yDirection * 2;
+            //    //bodyPartList[currentYPart].incrementRecY(yDirection * (numParts - currentYPart));
+
+            //    for (int j = numParts - 1; j >= 1; j--)
+            //    {
+            //        //for (int i = 0; i < speed; i++)
+            //        //{
+            //        //bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - (yDirection * 10));
+            //        bodyPartList[j].incrementRecY((yDirection));
+            //        //}
+            //    }
+            //}
+
+            if (currentYPart < numParts)
             {
-                for (int j = numParts - 1; j >= 1; j--)
-                {
-                    //for (int i = 0; i < speed; i++)
-                    //{
-                    bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - (yDirection * 10));
-                    //}
-                }
+                currentYPart++;
             }
+            if (currentYPart == numParts)
+            {
+                currentYPart = 0;
+            }
+
             if ((destination.Y - bodyPartList[0].getRecY()) < 0)
                 yDirection = -1;
             else if ((destination.Y - bodyPartList[0].getRecY()) > 0)
@@ -236,17 +289,17 @@ namespace RobotBosses
             else
                 yDirection = 0;
 
-            if (hasMovedInTick == false)
-            {
-                for (int i = 0; i < speed; i++)
-                {
-                    if (bodyPartList[0].getRec().Y != destination.Y)
-                    {
-                        bodyPartList[0].incrementRecY(yDirection);
-                    }
-                }
+            //if (hasMovedInTick == false)
+            //{
+                //for (int i = 0; i < speed; i++)
+                //{
+                //    if (bodyPartList[0].getRec().Y != destination.Y)
+                //    {
+                //        bodyPartList[0].incrementRecY(yDirection);
+                //    }
+                //}
                 hasMovedInTick = true;
-            }
+            //}
         }
 
         public void flailAttack()
