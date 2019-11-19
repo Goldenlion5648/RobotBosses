@@ -181,26 +181,43 @@ namespace RobotBosses
 
             if (yDirection == 0 || Math.Abs(destination.Y - bodyPartList[0].getRecY()) < this.speed)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < speed; i++)
                 {
+                    if ((destination.Y - bodyPartList[currentYPart].getRecY()) < 0)
+                        yDirection = -1;
+                    else if ((destination.Y - bodyPartList[currentYPart].getRecY()) > 0)
+                        yDirection = 1;
+                    else
+                        yDirection = 0;
 
-                if ((destination.Y - bodyPartList[currentYPart].getRecY()) < 0)
-                    yDirection = -1;
-                else if ((destination.Y - bodyPartList[currentYPart].getRecY()) > 0)
-                    yDirection = 1;
-                else
-                    yDirection = 0;
-
-                bodyPartList[currentYPart].incrementRecY(yDirection);
+                    bodyPartList[currentYPart].incrementRecY(yDirection);
                 }
+                //bool isDone = true;
+                //for (int i = 0; i < numParts; i++)
+                //{
+                //    if (bodyPartList[i].getRecY() != destination.X)
+                //    {
+                //        isDone = false;
+                //        break;
+                //    }
+                //    bodyPartList[currentYPart].incrementRecY(yDirection);
+                //}
+
+                //if (isDone)
+                //{
+                //    currentYPart = 1;
+                //}
+                //else
+                //{
                 if (currentYPart < numParts)
                 {
                     currentYPart++;
                 }
-                if(currentYPart == numParts)
+                if (currentYPart == numParts)
                 {
                     currentYPart = 1;
                 }
+                //}
             }
             else
             {
@@ -212,6 +229,13 @@ namespace RobotBosses
                     //}
                 }
             }
+            if ((destination.Y - bodyPartList[0].getRecY()) < 0)
+                yDirection = -1;
+            else if ((destination.Y - bodyPartList[0].getRecY()) > 0)
+                yDirection = 1;
+            else
+                yDirection = 0;
+
             if (hasMovedInTick == false)
             {
                 for (int i = 0; i < speed; i++)
@@ -244,7 +268,7 @@ namespace RobotBosses
 
             for (int i = 0; i < numParts; i++)
             {
-                bodyPartList[i].setRecY(bodyPartList[numParts - 1]);
+                bodyPartList[i].setRecY(bodyPartList[numParts - 1].getRecY());
             }
             isStraightened = true;
         }
