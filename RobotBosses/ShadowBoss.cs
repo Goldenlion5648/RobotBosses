@@ -41,20 +41,24 @@ namespace RobotBosses
         public bool shouldDoAcrossAttack { get; set; }
 
         private int currentYPart = 0;
+        private int currentVerticalPart = 1;
         private bool isStraightened = true;
         private bool hasSetUpMoving = false;
 
-        public ShadowBoss(ref Texture2D tex, Rectangle rectangle, ref Player player)
+        private Point startingPos;
+
+        public ShadowBoss(ref Texture2D tex, Point startingPos, ref Player player)
         {
-            this.rec = rectangle;
+            //this.rec = rectangle;
             this.texture = tex;
             this.health = 150;
             this.speed = 6;
             this.player = player;
+            this.startingPos = startingPos;
 
             for (int i = 0; i < numParts; i++)
             {
-                bodyPartList.Add(new SnakePart(new Rectangle(rectangle.X + partDimension * i, rectangle.Y, partDimension, partDimension)));
+                bodyPartList.Add(new SnakePart(new Rectangle(startingPos.X + partDimension * i, startingPos.Y, partDimension, partDimension)));
             }
 
         }
@@ -122,6 +126,30 @@ namespace RobotBosses
             isStraightened = false;
         }
 
+        public void moveLeft(int sideSpeed)
+        {
+            for (int i = 0; i < numParts; i++)
+            {
+                for (int j = 0; j < sideSpeed; j++)
+                {
+                bodyPartList[i].incrementRecX(-1);
+                    inflictDamageToPlayer();
+                }
+            }
+        }
+
+        public void moveRight(int sideSpeed)
+        {
+            for (int i = 0; i < numParts; i++)
+            {
+                for (int j = 0; j < sideSpeed; j++)
+                {
+                    bodyPartList[i].incrementRecX(1);
+                    inflictDamageToPlayer();
+                }
+            }
+        }
+
         public void inflictDamageToPlayer()
         {
             for (int i = numParts - 1; i >= 0; i--)
@@ -140,30 +168,30 @@ namespace RobotBosses
         public void moveToPoint(Point destination)
         {
             //resetToStraight();
-            if(hasSetUpMoving == false)
+            if (hasSetUpMoving == false)
             {
-                int displacement = 0;
-                if ((destination.Y - bodyPartList[0].getRecY()) < 0)
+                //int displacement = 0;
+                if ((destination.Y - bodyPartList[0].getRecY()) < -50)
                 {
                     turnUp();
-                    displacement = -1;
+                    //displacement = -1;
 
                 }
-                else if ((destination.Y - bodyPartList[0].getRecY()) > 0)
-                { 
+                else if ((destination.Y - bodyPartList[0].getRecY()) > 50)
+                {
                     turnDown();
-                    displacement = 1;
+                    //displacement = 1;
 
                 }
                 hasSetUpMoving = true;
                 currentYPart = 0;
-                for (int i = 0; i < speed; i++)
-                {
-                    if (bodyPartList[0].getRec().Y != destination.Y)
-                    {
-                        bodyPartList[0].incrementRecY(displacement);
-                    }
-                }
+                //for (int i = 0; i < speed; i++)
+                //{
+                //    if (bodyPartList[0].getRec().Y != destination.Y)
+                //    {
+                //        bodyPartList[0].incrementRecY(displacement);
+                //    }
+                //}
             }
 
 
@@ -184,18 +212,18 @@ namespace RobotBosses
                     //bodyPartList[j].incrementRecX(xDirection * 3);
                 }
             }
-            if (hasMovedInTick == false)
+            //if (hasMovedInTick == false)
+            //{
+            //for (int i = 0; i < speed; i++)
+            //{
+
+            if (bodyPartList[0].getRec().X != destination.X)
             {
-                for (int i = 0; i < speed; i++)
-                {
-
-                    if (bodyPartList[0].getRec().X != destination.X)
-                    {
-                        bodyPartList[0].incrementRecX(xDirection);
-                    }
-
-                }
+                bodyPartList[0].incrementRecX(xDirection);
             }
+
+            //    }
+            //}
 
 
             int yDirection = -1;
@@ -231,12 +259,12 @@ namespace RobotBosses
 
                     if (bodyPartList[i].getRecY() != destination.Y)
                     {
-                    bodyPartList[i].incrementRecY(yDirection);
+                        bodyPartList[i].incrementRecY(yDirection);
                         isDone = false;
                         //break;
                     }
                 }
-                if(isDone)
+                if (isDone)
                 {
                     currentYPart = 0;
                     hasSetUpMoving = false;
@@ -291,14 +319,14 @@ namespace RobotBosses
 
             //if (hasMovedInTick == false)
             //{
-                //for (int i = 0; i < speed; i++)
-                //{
-                //    if (bodyPartList[0].getRec().Y != destination.Y)
-                //    {
-                //        bodyPartList[0].incrementRecY(yDirection);
-                //    }
-                //}
-                hasMovedInTick = true;
+            //for (int i = 0; i < speed; i++)
+            //{
+            //    if (bodyPartList[0].getRec().Y != destination.Y)
+            //    {
+            //        bodyPartList[0].incrementRecY(yDirection);
+            //    }
+            //}
+            //hasMovedInTick = true;
             //}
         }
 
@@ -312,7 +340,7 @@ namespace RobotBosses
 
             for (int i = 0; i < numParts; i++)
             {
-                bodyPartList[i] = (new SnakePart(new Rectangle(rec.X + partDimension * i, rec.Y, partDimension, partDimension)));
+                bodyPartList[i] = (new SnakePart(new Rectangle(startingPos.X + partDimension * i, startingPos.Y, partDimension, partDimension)));
             }
         }
 
@@ -353,9 +381,65 @@ namespace RobotBosses
 
         }
 
-        public void rotateToUpper(int gameClock)
+        public void clumpUpFromHorizontal()
         {
+            for (int i = 1; i < numParts; i++)
+            {
+                for (int j = 0; j < speed; j++)
+                {
+                    if (bodyPartList[i].getRecX() > bodyPartList[0].getRecX())
+                    {
+                        bodyPartList[i].incrementRecX(-1);
+                        inflictDamageToPlayer();
+                    }
+                }
+            }
+        }
 
+        public void clumpUpFromVertical()
+        {
+            for (int i = 1; i < numParts; i++)
+            {
+                for (int j = 0; j < speed; j++)
+                {
+                    if (bodyPartList[i].getRecY() < bodyPartList[0].getRecY())
+                    {
+                        bodyPartList[i].incrementRecY(1);
+                        inflictDamageToPlayer();
+                    }
+                }
+            }
+        }
+
+        public void transitionToDownwardVertical()
+        {
+            //clumpUpFromHorizontal();
+            //currentVerticalPart = 1;
+            bool hasFinishedMoving = false;
+            for (int j = 0; j <= currentVerticalPart - 1; j++)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    //{
+                    if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
+                    {
+                        bodyPartList[j].incrementRecY(1);
+                    }
+                    else
+                    {
+                        hasFinishedMoving = true;
+                       
+                    }
+                }
+            }
+            if (hasFinishedMoving)
+            {
+                currentVerticalPart++;
+                if (currentVerticalPart == numParts)
+                    currentVerticalPart = 1;
+            }
+
+            //}
         }
 
         public override void drawCharacter(SpriteBatch sb, Color color)
@@ -367,10 +451,9 @@ namespace RobotBosses
             sb.Draw(texture, rec, Color.White);
             for (int i = 0; i < numParts; i++)
             {
-                sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * 5, i));
+                sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * 10, i));
             }
         }
-
 
     }
 }

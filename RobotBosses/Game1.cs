@@ -42,7 +42,7 @@ namespace RobotBosses
         int screenWidth = 1080;
         int screenHeight = 720;
 
-        int playerHeight = 5;
+        int playerHeight = 60;
         int playerWidth = 40;
 
         int currentShadowPathNum = -1;
@@ -108,7 +108,7 @@ namespace RobotBosses
             pathMaker.speed = 2;
 
             shadowBoss = new ShadowBoss(ref blankSquare,
-                new Rectangle(400, screenHeight / 2, playerWidth * 4, playerHeight / 3), ref player);
+                new Point(400, screenHeight / 2), ref player);
 
             // TODO: use this.Content to load your game content here
         }
@@ -262,7 +262,7 @@ namespace RobotBosses
                         shadowPathList.Clear();
                         currentShadowPathNum = -1;
                         shouldAddShadow = false;
-                        
+
                     }
                 }
 
@@ -279,8 +279,6 @@ namespace RobotBosses
                         //shadowPathList[currentShadowPathNum].incrementRecY(1);
                         shadowPathList[currentShadowPathNum].incrementRecHeight(1);
                         pathMaker.incrementRecY(1);
-
-
                     }
 
                 }
@@ -330,23 +328,32 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.I))
             {
-                if (gameClock % 10 == 0)
                     shadowBoss.turnUp();
+            }
+
+            if (kb.IsKeyDown(Keys.J))
+            {
+                shadowBoss.moveLeft(3);
+            }
+
+            if (kb.IsKeyDown(Keys.L))
+            {
+                shadowBoss.moveRight(3);
             }
 
             if (kb.IsKeyDown(Keys.H))
             {
                 //if (gameClock % 10 == 0)
                 {
-                    shadowBoss.hasMovedInTick = false;
-                    //for (int i = 0; i < shadowBoss.numParts; i++)
+                    for (int i = 0; i < shadowBoss.speed; i++)
                     {
+                    shadowBoss.hasMovedInTick = false;
 
                         shadowBoss.moveToPoint(mousePos);
-                        //for (int j = 0; j < shadowBoss.numParts; j++)
-                        //{
-                        //    collideWithPlayer(30, shadowBoss.getPartRec(j));
-                        //}
+                        for (int j = 0; j < shadowBoss.numParts; j++)
+                        {
+                            collideWithPlayer(30, shadowBoss.getPartRec(j));
+                        }
                         //collideWithPlayer(30, shadowBoss.getRec());
                     }
                 }
@@ -354,7 +361,7 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.K))
             {
-                if (gameClock % 10 == 0)
+                //if (gameClock % 2 == 0)
                     shadowBoss.turnDown();
             }
 
@@ -365,8 +372,20 @@ namespace RobotBosses
 
             if (kb.IsKeyDown(Keys.R))
             {
-                shadowBoss.rotateToUpper(gameClock);
+                //shadowBoss.rotateToUpper(gameClock);
             }
+            if (kb.IsKeyDown(Keys.Y))
+            {
+                shadowBoss.clumpUpFromHorizontal();
+                shadowBoss.transitionToDownwardVertical();
+            }
+
+            if (kb.IsKeyDown(Keys.U))
+            {
+                shadowBoss.clumpUpFromHorizontal();
+                shadowBoss.transitionToDownwardVertical();
+            }
+
 
             if (kb.IsKeyDown(Keys.P) && oldkb.IsKeyUp(Keys.P))
             {
