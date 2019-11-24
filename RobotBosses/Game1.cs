@@ -29,6 +29,8 @@ namespace RobotBosses
         bool shouldMakeShadowPaths = false;
         bool shouldAddShadow = true;
 
+        bool debugMode = true;
+
         int gameClock = 1;
 
         List<ShadowPath> shadowPathList = new List<ShadowPath>();
@@ -100,7 +102,7 @@ namespace RobotBosses
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
             playerHealthBar = new HealthBar(ref blankSquare,
-                new Rectangle(30, 20, 200, 45), 5);
+                new Rectangle(30, screenHeight - 60, 200, 45), 5);
 
             pathMaker = new Enemy(ref blankSquare,
                 new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth, playerWidth));
@@ -160,19 +162,21 @@ namespace RobotBosses
             userControls();
             //collideWithPlayer(30, shadowBoss.getRec());
 
-            if (shadowBoss.shouldDoAcrossAttack)
-            {
-                for (int i = 0; i < 4; i++)
-                {
-                    shadowBoss.acrossScreenAttack();
-                    //collideWithPlayer(30, shadowBoss.getRec());
+            //if (shadowBoss.shouldDoAcrossAttack)
+            //{
+            //    for (int i = 0; i < 4; i++)
+            //    {
+            //        shadowBoss.acrossScreenAttack();
+            //        //collideWithPlayer(30, shadowBoss.getRec());
 
 
-                }
-            }
+            //    }
+            //}
             //shadowBoss.rotateToUpper(gameClock);
             //shadowBoss.animate();
             makeShadowPaths();
+
+            //shadowBoss.verticalSweepAttack();
 
             endOfTickCode();
         }
@@ -317,82 +321,121 @@ namespace RobotBosses
 
         }
 
+        public void speedUpSweep()
+        {
+            if(shadowBoss.getPartRec(0).Y < -2000)
+            {
+                shadowBoss.turnUp();
+            }
+        }
+
         public void userControls()
         {
             //debug keybinds
-            //if (kb.IsKeyDown(Keys.U) && oldkb.IsKeyUp(Keys.U))
+            //if (kb.IsKeyDown(Keys.D2) && oldkb.IsKeyUp(Keys.D2))
             //{
-            //    shadowBoss.shouldDoAcrossAttack = true;
+            //    shadowBoss.shouldDoAcrossAttack = !shadowBoss.shouldDoAcrossAttack;
 
             //}
-
-            if (kb.IsKeyDown(Keys.I))
+            if (debugMode)
             {
-                    shadowBoss.turnUp();
-            }
 
-            if (kb.IsKeyDown(Keys.J))
-            {
-                shadowBoss.moveLeft(3);
-            }
-
-            if (kb.IsKeyDown(Keys.L))
-            {
-                shadowBoss.moveRight(3);
-            }
-
-            if (kb.IsKeyDown(Keys.H))
-            {
-                //if (gameClock % 10 == 0)
+                if (kb.IsKeyDown(Keys.I))
                 {
+                    shadowBoss.turnUp();
+                }
+
+                if (kb.IsKeyDown(Keys.J))
+                {
+                    shadowBoss.moveLeft(3);
+                }
+
+                if (kb.IsKeyDown(Keys.D9))
+                {
+                    shadowBoss.straightenInPlace();
+                }
+
+                if (kb.IsKeyDown(Keys.L))
+                {
+                    shadowBoss.moveRight(3);
+                }
+
+                if (kb.IsKeyDown(Keys.H))
+                {
+                    //if (gameClock % 10 == 0)
+                    //{
                     for (int i = 0; i < shadowBoss.speed; i++)
                     {
-                    shadowBoss.hasMovedInTick = false;
+                        shadowBoss.hasMovedInTick = false;
 
-                        shadowBoss.moveToPoint(mousePos);
-                        for (int j = 0; j < shadowBoss.numParts; j++)
-                        {
-                            collideWithPlayer(30, shadowBoss.getPartRec(j));
-                        }
-                        //collideWithPlayer(30, shadowBoss.getRec());
+                            shadowBoss.moveToPoint(mousePos);
+                            for (int j = 0; j < shadowBoss.numParts; j++)
+                            {
+                                collideWithPlayer(30, shadowBoss.getPartRec(j));
+                            }
+                            //collideWithPlayer(30, shadowBoss.getRec());
+                        //}
                     }
                 }
-            }
 
-            if (kb.IsKeyDown(Keys.K))
-            {
-                //if (gameClock % 2 == 0)
+                if (kb.IsKeyDown(Keys.K))
+                {
+                    //if (gameClock % 2 == 0)
                     shadowBoss.turnDown();
+                }
+
+                if (kb.IsKeyDown(Keys.O))
+                {
+                    shadowBoss.resetPosition();
+                }
+
+                if (kb.IsKeyDown(Keys.R))
+                {
+                    //shadowBoss.rotateToUpper(gameClock);
+                }
+                if (kb.IsKeyDown(Keys.D4))
+                {
+                    //shadowBoss.clumpUpFromHorizontal();
+                    shadowBoss.transitionToDownwardVerticalFromLeft();
+                }
+
+                if (kb.IsKeyDown(Keys.D5))
+                {
+                    //shadowBoss.clumpUpFromHorizontal();
+                    shadowBoss.transitionToDownwardVerticalFromRight();
+                }
+
+                if (kb.IsKeyDown(Keys.Y))
+                {
+                    //shadowBoss.clumpUpFromVertical();
+                    shadowBoss.transitionToLeftHorizontalFromDown();
+                }
+
+                if (kb.IsKeyDown(Keys.D6))
+                {
+                    //shadowBoss.clumpUpFromVertical();
+                    shadowBoss.transitionToLeftHorizontalFromUp();
+                }
+
+                if (kb.IsKeyDown(Keys.D7))
+                {
+                    //shadowBoss.clumpUpFromVertical();
+                    shadowBoss.transitionToUpwardVertical();
+                }
+
+                if (kb.IsKeyDown(Keys.D8))
+                {
+                    //shadowBoss.clumpUpFromVertical();
+                    shadowBoss.transitionToRightHorizontalFromUp();
+                }
+
+
+                if (kb.IsKeyDown(Keys.P) && oldkb.IsKeyUp(Keys.P))
+                {
+                    shouldMakeShadowPaths = !shouldMakeShadowPaths;
+                }
+
             }
-
-            if (kb.IsKeyDown(Keys.O))
-            {
-                shadowBoss.resetPosition();
-            }
-
-            if (kb.IsKeyDown(Keys.R))
-            {
-                //shadowBoss.rotateToUpper(gameClock);
-            }
-            if (kb.IsKeyDown(Keys.Y))
-            {
-                shadowBoss.clumpUpFromHorizontal();
-                shadowBoss.transitionToDownwardVertical();
-            }
-
-            if (kb.IsKeyDown(Keys.U))
-            {
-                shadowBoss.clumpUpFromHorizontal();
-                shadowBoss.transitionToDownwardVertical();
-            }
-
-
-            if (kb.IsKeyDown(Keys.P) && oldkb.IsKeyUp(Keys.P))
-            {
-                shouldMakeShadowPaths = !shouldMakeShadowPaths;
-            }
-
-
 
             if (kb.IsKeyDown(Keys.A) || kb.IsKeyDown(Keys.Left))
             {

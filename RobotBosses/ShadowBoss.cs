@@ -12,12 +12,12 @@ namespace RobotBosses
     class ShadowBoss : Enemy
     {
 
-        //enum facing
-        //{
-        //    up = 1, right, down, left
-        //}
+        enum facing
+        {
+            up = 1, right, down, left
+        }
 
-        //facing direction = facing.left;
+        facing facingDirection = facing.left;
 
         //List<Rectangle> parts = new List<Rectangle>();
 
@@ -41,9 +41,14 @@ namespace RobotBosses
         public bool shouldDoAcrossAttack { get; set; }
 
         private int currentYPart = 0;
-        private int currentVerticalPart = 1;
+        private int currentTransitionPart = 1;
         private bool isStraightened = true;
         private bool hasSetUpMoving = false;
+
+        bool isFlailingDown = false;
+        bool isFlailingUp = true;
+
+        public bool hasFinishedMoving { get; set; }
 
         private Point startingPos;
 
@@ -110,7 +115,7 @@ namespace RobotBosses
             }
             isStraightened = false;
         }
-        
+
         public void turnDown()
         {
 
@@ -126,13 +131,38 @@ namespace RobotBosses
             isStraightened = false;
         }
 
+        public void verticalSweepAttack()
+        {
+            if(bodyPartList[0].getRecY() < -4000)
+            {
+                isFlailingDown = true;
+                isFlailingUp = false;
+            }
+
+            if (bodyPartList[0].getRecY() > 4200)
+            {
+                isFlailingDown = false;
+                isFlailingUp = true;
+            }
+
+            if(isFlailingDown)
+            {
+                turnDown();
+            }
+
+            if (isFlailingUp)
+            {
+                turnUp();
+            }
+        }
+
         public void moveLeft(int sideSpeed)
         {
             for (int i = 0; i < numParts; i++)
             {
                 for (int j = 0; j < sideSpeed; j++)
                 {
-                bodyPartList[i].incrementRecX(-1);
+                    bodyPartList[i].incrementRecX(-1);
                     inflictDamageToPlayer();
                 }
             }
@@ -381,7 +411,7 @@ namespace RobotBosses
 
         }
 
-        public void clumpUpFromHorizontal()
+        public void clumpUpFromLeftHorizontal()
         {
             for (int i = 1; i < numParts; i++)
             {
@@ -396,7 +426,22 @@ namespace RobotBosses
             }
         }
 
-        public void clumpUpFromVertical()
+        public void clumpUpFromRightHorizontal()
+        {
+            for (int i = 1; i < numParts; i++)
+            {
+                for (int j = 0; j < speed; j++)
+                {
+                    if (bodyPartList[i].getRecX() < bodyPartList[0].getRecX())
+                    {
+                        bodyPartList[i].incrementRecX(1);
+                        inflictDamageToPlayer();
+                    }
+                }
+            }
+        }
+
+        public void clumpUpFromDownwardVertical()
         {
             for (int i = 1; i < numParts; i++)
             {
@@ -411,12 +456,26 @@ namespace RobotBosses
             }
         }
 
-        public void transitionToDownwardVertical()
+        public void clumpUpFromUpwardVertical()
         {
-            //clumpUpFromHorizontal();
-            //currentVerticalPart = 1;
-            bool hasFinishedMoving = false;
-            for (int j = 0; j <= currentVerticalPart - 1; j++)
+            for (int i = 1; i < numParts; i++)
+            {
+                for (int j = 0; j < speed; j++)
+                {
+                    if (bodyPartList[i].getRecY() > bodyPartList[0].getRecY())
+                    {
+                        bodyPartList[i].incrementRecY(-1);
+                        inflictDamageToPlayer();
+                    }
+                }
+            }
+        }
+
+        public void transitionToDownwardVerticalFromLeft()
+        {
+            clumpUpFromLeftHorizontal();
+            hasFinishedMoving = true;
+            for (int j = 0; j <= currentTransitionPart - 1; j++)
             {
                 for (int i = 0; i < speed; i++)
                 {
@@ -424,22 +483,160 @@ namespace RobotBosses
                     if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
                     {
                         bodyPartList[j].incrementRecY(1);
-                    }
-                    else
-                    {
-                        hasFinishedMoving = true;
-                       
+                        hasFinishedMoving = false;
                     }
                 }
             }
             if (hasFinishedMoving)
             {
-                currentVerticalPart++;
-                if (currentVerticalPart == numParts)
-                    currentVerticalPart = 1;
-            }
+                facingDirection = facing.down;
 
-            //}
+                currentTransitionPart++;
+                if (currentTransitionPart == numParts)
+                    currentTransitionPart = 1;
+            }
+        }
+
+        public void transitionToDownwardVerticalFromRight()
+        {
+            clumpUpFromRightHorizontal();
+            hasFinishedMoving = true;
+            for (int j = 0; j <= currentTransitionPart - 1; j++)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    //{
+                    if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
+                    {
+                        bodyPartList[j].incrementRecY(1);
+                        hasFinishedMoving = false;
+                    }
+                }
+            }
+            if (hasFinishedMoving)
+            {
+                facingDirection = facing.down;
+
+                currentTransitionPart++;
+                if (currentTransitionPart == numParts)
+                    currentTransitionPart = 1;
+            }
+        }
+
+        public void transitionToUpwardVertical()
+        {
+            clumpUpFromLeftHorizontal();
+            hasFinishedMoving = true;
+
+            for (int j = 0; j <= currentTransitionPart - 1; j++)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    //{
+                    if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
+                    {
+                        bodyPartList[j].incrementRecY(-1);
+                        hasFinishedMoving = false;
+                    }
+                }
+            }
+            if (hasFinishedMoving)
+            {
+                facingDirection = facing.up;
+
+                currentTransitionPart++;
+                if (currentTransitionPart == numParts)
+                    currentTransitionPart = 1;
+            }
+        }
+
+        public void transitionToLeftHorizontalFromDown()
+        {
+            clumpUpFromDownwardVertical();
+
+
+
+            hasFinishedMoving = true;
+
+            for (int j = 0; j <= currentTransitionPart - 1; j++)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    //{
+                    if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
+                    {
+                        bodyPartList[j].incrementRecX(-1);
+                        hasFinishedMoving = false;
+                    }
+                }
+            }
+            if (hasFinishedMoving)
+            {
+                facingDirection = facing.left;
+
+                currentTransitionPart++;
+                if (currentTransitionPart == numParts)
+                    currentTransitionPart = 1;
+            }
+        }
+
+        public void transitionToLeftHorizontalFromUp()
+        {
+                clumpUpFromUpwardVertical();
+
+            
+
+
+            hasFinishedMoving = true;
+
+            for (int j = 0; j <= currentTransitionPart - 1; j++)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    //{
+                    if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
+                    {
+                        bodyPartList[j].incrementRecX(-1);
+                        hasFinishedMoving = false;
+                    }
+                }
+            }
+            if (hasFinishedMoving)
+            {
+                facingDirection = facing.left;
+
+                currentTransitionPart++;
+                if (currentTransitionPart == numParts)
+                    currentTransitionPart = 1;
+            }
+        }
+
+        public void transitionToRightHorizontalFromUp()
+        {
+            clumpUpFromUpwardVertical();
+
+            hasFinishedMoving = true;
+
+            for (int j = 0; j <= currentTransitionPart - 1; j++)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+                    //{
+                    if (bodyPartList[j].getRec().Intersects(bodyPartList[j + 1].getRec()))
+                    {
+                        bodyPartList[j].incrementRecX(1);
+                        hasFinishedMoving = false;
+                    }
+                }
+            }
+            if (hasFinishedMoving)
+            {
+                facingDirection = facing.right;
+
+                currentTransitionPart++;
+                if (currentTransitionPart == numParts)
+                    currentTransitionPart = 1;
+            }
         }
 
         public override void drawCharacter(SpriteBatch sb, Color color)
