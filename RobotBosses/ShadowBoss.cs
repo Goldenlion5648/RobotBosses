@@ -19,6 +19,13 @@ namespace RobotBosses
 
         facing facingDirection = facing.left;
 
+        enum phase
+        {
+            patrol = 0, flail = 1, shadowPaths
+        }
+
+        phase currentPhase = phase.patrol;
+
         //List<Rectangle> parts = new List<Rectangle>();
 
         bool widthLarger;
@@ -45,10 +52,20 @@ namespace RobotBosses
         private bool isStraightened = true;
         private bool hasSetUpMoving = false;
 
+
+        public bool shouldDoSweepAttack { get; set; } = false;
         bool isFlailingDown = false;
         bool isFlailingUp = true;
 
+        public Point movementDestination { get; set; } = new Point(0, 0);
+        public bool shouldMoveToPoint { get; set; } = false;
+
         public bool hasFinishedMoving { get; set; }
+
+        private int colorCounter = 0;
+        private bool colorCountUp = true;
+
+        private int colorSwitchCount = 0;
 
         private Point startingPos;
 
@@ -133,6 +150,9 @@ namespace RobotBosses
 
         public void verticalSweepAttack()
         {
+            if (shouldDoSweepAttack == false)
+                return;
+
             if(bodyPartList[0].getRecY() < -4000)
             {
                 isFlailingDown = true;
@@ -195,8 +215,15 @@ namespace RobotBosses
             }
         }
 
+        public void patrol()
+        {
+
+        }
+
         public void moveToPoint(Point destination)
         {
+            if (shouldMoveToPoint == false)
+                return;
             //resetToStraight();
             if (hasSetUpMoving == false)
             {
@@ -639,7 +666,7 @@ namespace RobotBosses
             }
         }
 
-        public override void drawCharacter(SpriteBatch sb, Color color)
+        public void drawCharacter(SpriteBatch sb, int gameClock)
         {
 
             //sb.Draw(texture, head, Color.Red);
@@ -648,7 +675,33 @@ namespace RobotBosses
             sb.Draw(texture, rec, Color.White);
             for (int i = 0; i < numParts; i++)
             {
-                sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * 10, i));
+                sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+            }
+
+            if (colorSwitchCount < 3)
+            {
+                if (gameClock % 2 == 0)
+                {
+                    if (colorCountUp)
+                    {
+                        colorCounter++;
+                        if (colorCounter == 16)
+                        {
+                            colorCountUp = false;
+                            colorSwitchCount++;
+                        }
+                    }
+                    else
+                    {
+                        colorCounter--;
+                        if (colorCounter == -1)
+                            colorCountUp = true;
+                    }
+                }
+            }
+            else
+            {
+                colorCounter = 10;
             }
         }
 
