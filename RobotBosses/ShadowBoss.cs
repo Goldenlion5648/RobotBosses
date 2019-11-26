@@ -19,12 +19,12 @@ namespace RobotBosses
 
         facing facingDirection = facing.left;
 
-        enum phase
+        public enum phase
         {
-            patrol = 0, flail = 1, shadowPaths
+            patrol = 0, flail, shadowPaths, debug
         }
 
-        phase currentPhase = phase.patrol;
+        public phase currentPhase = phase.debug;
 
         //List<Rectangle> parts = new List<Rectangle>();
 
@@ -65,9 +65,14 @@ namespace RobotBosses
         private int colorCounter = 0;
         private bool colorCountUp = true;
 
-        private int colorSwitchCount = 0;
+        public int colorSwitchCount { get; set; } = 10;
 
-        private Point startingPos;
+        public int phaseCooldown { get; set; } = 0;
+        //private int colorSwitchCount = 10;
+
+
+        public Point startingPos { get; set; }
+        //private Point startingPos;
 
         public ShadowBoss(ref Texture2D tex, Point startingPos, ref Player player)
         {
@@ -150,8 +155,31 @@ namespace RobotBosses
 
         public void verticalSweepAttack()
         {
-            if (shouldDoSweepAttack == false)
+            if (currentPhase != phase.flail)
                 return;
+
+
+
+            if (colorSwitchCount == 10)
+            {
+                colorSwitchCount = 0;
+                straightenInPlace();
+                phaseCooldown = 1000;
+            }
+            if(bodyPartList[numParts - 1].getRecX() > numParts * partDimension + startingPos.X)
+            {
+                moveToPoint(startingPos);
+                phaseCooldown += 1;
+                return;
+            }
+            if(colorSwitchCount < 3)
+            {
+                return;
+                //shouldDoSweepAttack = false;
+            }
+
+            //if (shouldDoSweepAttack == false)
+                //return;
 
             if(bodyPartList[0].getRecY() < -4000)
             {
@@ -222,8 +250,8 @@ namespace RobotBosses
 
         public void moveToPoint(Point destination)
         {
-            if (shouldMoveToPoint == false)
-                return;
+            //if (shouldMoveToPoint == false)
+            //    return;
             //resetToStraight();
             if (hasSetUpMoving == false)
             {
@@ -385,11 +413,6 @@ namespace RobotBosses
             //}
             //hasMovedInTick = true;
             //}
-        }
-
-        public void flailAttack()
-        {
-
         }
 
         public void resetPosition()
@@ -673,10 +696,41 @@ namespace RobotBosses
             //sb.Draw(texture, body, Color.Green);
             //sb.Draw(texture, tail, Color.Blue);
             sb.Draw(texture, rec, Color.White);
-            for (int i = 0; i < numParts; i++)
+            if (currentPhase == phase.flail)
             {
-                sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+                for (int i = 0; i < numParts; i++)
+                {
+                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+                }
+
             }
+            else if (currentPhase == phase.patrol)
+            {
+                for (int i = 0; i < numParts; i++)
+                {
+                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i, i));
+                }
+
+            }
+            else if (currentPhase == phase.shadowPaths)
+            {
+                for (int i = 0; i < numParts; i++)
+                {
+                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i, i, i * colorCounter));
+                }
+            }
+            else
+            {
+                for (int i = 0; i < numParts; i++)
+                {
+                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * colorCounter, i));
+                }
+            }
+
+            //for (int i = 0; i < numParts; i++)
+            //{
+            //    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+            //}
 
             if (colorSwitchCount < 3)
             {
@@ -703,6 +757,8 @@ namespace RobotBosses
             {
                 colorCounter = 10;
             }
+
+
         }
 
     }

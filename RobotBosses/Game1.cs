@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace RobotBosses
 {
@@ -20,7 +21,7 @@ namespace RobotBosses
 
         Texture2D blankSquare;
         SpriteFont debugFont;
-
+        
         KeyboardState kb, oldkb;
 
         MouseState ms;
@@ -41,8 +42,8 @@ namespace RobotBosses
         Enemy pathMaker;
 
 
-        int screenWidth = 1080;
-        int screenHeight = 720;
+        public int screenWidth = 1080;
+        public int screenHeight = 720;
 
         int playerHeight = 60;
         int playerWidth = 40;
@@ -177,13 +178,14 @@ namespace RobotBosses
             //shadowBoss.animate();
             makeShadowPaths();
 
-            if (shadowBoss.shouldDoSweepAttack)
+            if (shadowBoss.currentPhase == ShadowBoss.phase.flail)
             {
                 shadowBoss.verticalSweepAttack();
             }
 
-            if (shadowBoss.shouldMoveToPoint)
+            if (shadowBoss.currentPhase == ShadowBoss.phase.patrol)
             {
+                shadowBoss.shouldMoveToPoint = true;
                 for (int i = 0; i < shadowBoss.speed; i++)
                 {
                     shadowBoss.hasMovedInTick = false;
@@ -225,6 +227,13 @@ namespace RobotBosses
             {
                 player.hitCooldown--;
             }
+            if (shadowBoss.phaseCooldown > 0)
+                shadowBoss.phaseCooldown--;
+
+            if(shadowBoss.phaseCooldown == 0)
+            {
+                changeToNewPhase();
+            }
 
             //for (int j = 0; j < shadowBoss.numParts; j++)
             //{
@@ -237,12 +246,38 @@ namespace RobotBosses
 
         public void makeShadowPaths()
         {
-            if (shouldMakeShadowPaths == false)
+            if (shadowBoss.currentPhase != ShadowBoss.phase.shadowPaths)
                 return;
+
+            //else
+            //{
+            //    shadowBoss.currentPhase = ShadowBoss.phase.shadowPaths;
+            //}
 
             if(shadowPathStartTime == 0)
             {
                 shadowPathStartTime = gameClock;
+                shadowBoss.phaseCooldown = 900;
+            }
+
+            if (shadowBoss.phaseCooldown > 730)
+            {
+
+                for (int i = 0; i < shadowBoss.speed; i++)
+                {
+                    shadowBoss.hasMovedInTick = false;
+
+                    shadowBoss.moveToPoint(new Point(screenWidth + 10, shadowBoss.startingPos.Y));
+                    for (int j = 0; j < shadowBoss.numParts; j++)
+                    {
+                        collideWithPlayer(30, shadowBoss.getPartRec(j));
+                    }
+                    //collideWithPlayer(30, shadowBoss.getRec());
+                    //}
+                }
+
+
+                return;
             }
 
             for (int i = 0; i < pathMaker.speed; i++)
@@ -294,15 +329,18 @@ namespace RobotBosses
                 if (shouldAddShadow)
                 {
                     //shadowPathStartTime = gameClock;
-                    if (gameClock - shadowPathStartTime > 730)
+                    //if (gameClock - shadowPathStartTime > 730)
+                    if (shadowBoss.phaseCooldown == 1)
                     {
                         //clear shadow paths
-                        shouldMakeShadowPaths = false;
-                        pathMaker.resetPos();
-                        shadowPathList.Clear();
-                        currentShadowPathNum = -1;
-                        shouldAddShadow = false;
-                        shadowPathStartTime = 0;
+
+                        //shouldMakeShadowPaths = false;
+                        //pathMaker.resetPos();
+                        //shadowPathList.Clear();
+                        //currentShadowPathNum = -1;
+                        //shouldAddShadow = false;
+                        //shadowPathStartTime = 0;
+                        //changeToNewPhase();
                     }
                     else
                     {
@@ -326,8 +364,8 @@ namespace RobotBosses
                     }
                 }
 
-                if (shouldMakeShadowPaths)
-                {
+                //if (shadowBoss.currentPhase == ShadowBoss.phase.shadowPaths)
+                //{
                     if (currentShadowPathNum < 3)
                     {
                         shadowPathList[currentShadowPathNum].incrementRecX(-1);
@@ -341,7 +379,7 @@ namespace RobotBosses
                         pathMaker.incrementRecY(1);
                     }
 
-                }
+                //}
 
             }
 
@@ -390,6 +428,27 @@ namespace RobotBosses
             }
         }
 
+        public void changeToNewPhase()
+        {
+            //var  last = Enum.GetValues(typeof(ShadowBoss.phase)).Cast<int>().Max();
+
+            if(shadowBoss.currentPhase == ShadowBoss.phase.shadowPaths)
+            {
+                pathMaker.resetPos();
+                shadowPathList.Clear();
+                currentShadowPathNum = -1;
+                shouldAddShadow = false;
+                shadowPathStartTime = 0;
+            }
+
+            int originalPhase = (int)shadowBoss.currentPhase;
+            while ((int)shadowBoss.currentPhase == originalPhase)
+            {
+                shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
+            }
+            shadowBoss.colorSwitchCount = 10;
+        }
+
         public void userControls()
         {
             //debug keybinds
@@ -423,6 +482,7 @@ namespace RobotBosses
 
                 if (kb.IsKeyDown(Keys.H))
                 {
+                    shadowBoss.currentPhase = ShadowBoss.phase.debug;
                     //if (gameClock % 10 == 0)
                     //{
                     for (int i = 0; i < shadowBoss.speed; i++)
@@ -500,8 +560,9 @@ namespace RobotBosses
                 if (kb.IsKeyDown(Keys.D1) && oldkb.IsKeyUp(Keys.D1))
                 {
                     //shadowBoss.clumpUpFromVertical();
-                    shadowBoss.straightenInPlace();
-                    shadowBoss.shouldDoSweepAttack = !shadowBoss.shouldDoSweepAttack;
+                    //shadowBoss.straightenInPlace();
+                    //shadowBoss.shouldDoSweepAttack = !shadowBoss.shouldDoSweepAttack;
+                    shadowBoss.currentPhase = ShadowBoss.phase.flail;
                 }
 
                 if (kb.IsKeyDown(Keys.G))
@@ -513,7 +574,8 @@ namespace RobotBosses
 
                 if (kb.IsKeyDown(Keys.P) && oldkb.IsKeyUp(Keys.P))
                 {
-                    shouldMakeShadowPaths = !shouldMakeShadowPaths;
+                    //shouldMakeShadowPaths = !shouldMakeShadowPaths;
+                    shadowBoss.currentPhase = ShadowBoss.phase.shadowPaths;
                 }
 
             }
