@@ -72,6 +72,7 @@ namespace RobotBosses
 
 
         public Point startingPos { get; set; }
+        public Point patrolPos { get; set; }
         //private Point startingPos;
 
         public ShadowBoss(ref Texture2D tex, Point startingPos, ref Player player)
@@ -166,13 +167,28 @@ namespace RobotBosses
                 straightenInPlace();
                 phaseCooldown = 1000;
             }
-            if(bodyPartList[numParts - 1].getRecX() > numParts * partDimension + startingPos.X)
+            if(bodyPartList[numParts - 1].getRecX() > (numParts - 1) * partDimension + startingPos.X)
             {
-                moveToPoint(startingPos);
+                for (int i = 0; i < speed; i++)
+                {
+                    hasMovedInTick = false;
+                    moveToPoint(startingPos);
+                    if (bodyPartList[numParts - 2].getRecX() - 2 == (numParts - 1) * partDimension + startingPos.X)
+                    {
+                        //resetPos();
+                        return;
+                    }
+
+                }
                 phaseCooldown += 1;
                 return;
+
             }
-            if(colorSwitchCount < 3)
+            else
+            {
+                resetPos();
+            }
+            if (colorSwitchCount < 3)
             {
                 return;
                 //shouldDoSweepAttack = false;
@@ -245,6 +261,46 @@ namespace RobotBosses
 
         public void patrol()
         {
+            if (currentPhase != phase.patrol)
+                return;
+
+            if (colorSwitchCount == 10)
+            {
+                colorSwitchCount = 0;
+                straightenInPlace();
+                phaseCooldown = 1000;
+                if(player.getRecX() > Game1.screenWidth /2)
+                {
+                    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
+                }
+                else
+                {
+                    patrolPos = new Point(player.getRecX(), player.getRecY());
+                }
+            }
+
+            if(new Point(bodyPartList[0].getRecX(), bodyPartList[0].getRecY()) != patrolPos)
+            {
+                for (int i = 0; i < speed; i++)
+                {
+
+                hasMovedInTick = false;
+                moveToPoint(patrolPos);
+                }
+            }
+            else
+            {
+                if (player.getRecX() > Game1.screenWidth / 2)
+                {
+                    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
+                }
+                else
+                {
+                    patrolPos = new Point(player.getRecX(), player.getRecY());
+                }
+            }
+
+
 
         }
 

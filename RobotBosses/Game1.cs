@@ -42,8 +42,8 @@ namespace RobotBosses
         Enemy pathMaker;
 
 
-        public int screenWidth = 1080;
-        public int screenHeight = 720;
+        public static int screenWidth = 1080;
+        public static int screenHeight = 720;
 
         int playerHeight = 60;
         int playerWidth = 40;
@@ -162,20 +162,7 @@ namespace RobotBosses
         public void shadowBossLevel()
         {
             userControls();
-            //collideWithPlayer(30, shadowBoss.getRec());
 
-            //if (shadowBoss.shouldDoAcrossAttack)
-            //{
-            //    for (int i = 0; i < 4; i++)
-            //    {
-            //        shadowBoss.acrossScreenAttack();
-            //        //collideWithPlayer(30, shadowBoss.getRec());
-
-
-            //    }
-            //}
-            //shadowBoss.rotateToUpper(gameClock);
-            //shadowBoss.animate();
             makeShadowPaths();
 
             if (shadowBoss.currentPhase == ShadowBoss.phase.flail)
@@ -258,16 +245,19 @@ namespace RobotBosses
             {
                 shadowPathStartTime = gameClock;
                 shadowBoss.phaseCooldown = 900;
+                shadowBoss.straightenInPlace();
             }
 
-            if (shadowBoss.phaseCooldown > 730)
+            if (shadowBoss.phaseCooldown > 780)
             {
 
                 for (int i = 0; i < shadowBoss.speed; i++)
                 {
                     shadowBoss.hasMovedInTick = false;
 
-                    shadowBoss.moveToPoint(new Point(screenWidth + 10, shadowBoss.startingPos.Y));
+                    //shadowBoss.moveToPoint(new Point(screenWidth + 10, shadowBoss.startingPos.Y));
+                    shadowBoss.moveToPoint(new Point(screenWidth + 10, playerHeight));
+
                     for (int j = 0; j < shadowBoss.numParts; j++)
                     {
                         collideWithPlayer(30, shadowBoss.getPartRec(j));
@@ -442,10 +432,13 @@ namespace RobotBosses
             }
 
             int originalPhase = (int)shadowBoss.currentPhase;
-            while ((int)shadowBoss.currentPhase == originalPhase)
-            {
-                shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
-            }
+            //while ((int)shadowBoss.currentPhase == originalPhase)
+            //{
+            //    //shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
+            //    shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(0, (int)ShadowBoss.phase.debug);
+
+            //}
+            shadowBoss.currentPhase = ShadowBoss.phase.patrol;
             shadowBoss.colorSwitchCount = 10;
         }
 
@@ -667,6 +660,7 @@ namespace RobotBosses
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
             spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
             spriteBatch.DrawString(debugFont, "shadowPathStartTime: " + shadowPathStartTime, new Vector2(100,  60), Color.Green);
+            spriteBatch.DrawString(debugFont, "patrolPosX: " + shadowBoss.patrolPos.X + " Y: " + shadowBoss.patrolPos.Y, new Vector2(100,  120), Color.Green);
             spriteBatch.DrawString(debugFont, "bossHeadX: " + shadowBoss.getPartRec(0).X + "bossHeadY: " + shadowBoss.getPartRec(0).Y,
                 new Vector2(100, screenHeight - 40), Color.Green);
 
