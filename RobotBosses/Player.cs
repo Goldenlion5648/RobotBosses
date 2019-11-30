@@ -18,6 +18,7 @@ namespace RobotBosses
             this.rec = rectangle;
             this.texture = tex;
             this.health = 100;
+            this.startingHealth = 100;
         }
 
     }

@@ -73,6 +73,8 @@ namespace RobotBosses
 
         public Point startingPos { get; set; }
         public Point patrolPos { get; set; }
+
+        public int patrolCooldown { get; set; } = 0;
         //private Point startingPos;
 
         public ShadowBoss(ref Texture2D tex, Point startingPos, ref Player player)
@@ -80,6 +82,7 @@ namespace RobotBosses
             //this.rec = rectangle;
             this.texture = tex;
             this.health = 150;
+            this.startingHealth = 150;
             this.speed = 6;
             this.player = player;
             this.startingPos = startingPos;
@@ -269,35 +272,66 @@ namespace RobotBosses
                 colorSwitchCount = 0;
                 straightenInPlace();
                 phaseCooldown = 1000;
-                if(player.getRecX() > Game1.screenWidth /2)
+
+                if (Math.Abs(bodyPartList[0].getRecX() - player.getRecX()) > Math.Abs(bodyPartList[0].getRecY() - player.getRecY()))
                 {
-                    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
+                    patrolPos = new Point(player.getRecX(), bodyPartList[0].getRecY());
+
                 }
                 else
                 {
-                    patrolPos = new Point(player.getRecX(), player.getRecY());
+                    patrolPos = new Point(bodyPartList[0].getRecX(), player.getRecY());
                 }
+                //if (player.getRecX() > Game1.screenWidth / 2)
+                //{
+                //    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
+                //}
+                //else
+                //{
+                //    patrolPos = new Point(player.getRecX(), player.getRecY());
+                //}
             }
 
-            if(new Point(bodyPartList[0].getRecX(), bodyPartList[0].getRecY()) != patrolPos)
+            if (new Point(bodyPartList[0].getRecX(), bodyPartList[0].getRecY()) != patrolPos)
             {
-                for (int i = 0; i < speed; i++)
+                if (patrolCooldown == 0)
                 {
+                    for (int i = 0; i < speed / 2; i++)
+                    {
 
-                hasMovedInTick = false;
-                moveToPoint(patrolPos);
+                        hasMovedInTick = false;
+                        moveToPoint(patrolPos);
+                    }
+                }
+                else
+                {
+                    if (patrolCooldown > 0)
+                        patrolCooldown--;
                 }
             }
             else
             {
-                if (player.getRecX() > Game1.screenWidth / 2)
+                patrolCooldown = 5;
+
+                if (Math.Abs(bodyPartList[0].getRecX() - player.getRecX()) > Math.Abs(bodyPartList[0].getRecY() - player.getRecY()))
                 {
-                    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
+                    patrolPos = new Point(player.getRecX(), bodyPartList[0].getRecY());
+
                 }
                 else
                 {
-                    patrolPos = new Point(player.getRecX(), player.getRecY());
+                    patrolPos = new Point(bodyPartList[0].getRecX(), player.getRecY());
                 }
+
+                //patrolPos = new Point(player.getRecX(), player.getRecY());
+                //if (player.getRecX() > Game1.screenWidth / 2)
+                //{
+                //    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
+                //}
+                //else
+                //{
+                //    patrolPos = new Point(player.getRecX(), player.getRecY());
+                //}
             }
 
 

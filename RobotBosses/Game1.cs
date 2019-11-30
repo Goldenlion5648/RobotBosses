@@ -103,8 +103,8 @@ namespace RobotBosses
             player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
-            playerHealthBar = new HealthBar(ref blankSquare,
-                new Rectangle(30, screenHeight - 60, 200, 45), 5);
+            playerHealthBar = new HealthBar(ref blankSquare, new Rectangle(30, screenHeight - 60, 200, 35), 5);
+            bossHealthBar = new HealthBar(ref blankSquare, new Rectangle(screenWidth / 2 + 30, screenHeight - 60, 400, 35), 5);
 
             pathMaker = new Enemy(ref blankSquare,
                 new Rectangle(screenWidth - 10, screenHeight - playerWidth - 20, playerWidth, playerWidth));
@@ -172,21 +172,23 @@ namespace RobotBosses
 
             if (shadowBoss.currentPhase == ShadowBoss.phase.patrol)
             {
-                shadowBoss.shouldMoveToPoint = true;
-                for (int i = 0; i < shadowBoss.speed; i++)
-                {
-                    shadowBoss.hasMovedInTick = false;
 
-                    shadowBoss.moveToPoint(new Point(0, screenHeight - shadowBoss.getPartRec(0).Height));
-                    //shadowBoss.moveToPoint(new Point(player.getRecX(), player.getRecY()));
+                shadowBoss.patrol();
+                //shadowBoss.shouldMoveToPoint = true;
+                //for (int i = 0; i < shadowBoss.speed; i++)
+                //{
+                //    shadowBoss.hasMovedInTick = false;
 
-                    for (int j = 0; j < shadowBoss.numParts; j++)
-                    {
-                        collideWithPlayer(30, shadowBoss.getPartRec(j));
-                    }
-                    //collideWithPlayer(30, shadowBoss.getRec());
-                    //}
-                }
+                //    shadowBoss.moveToPoint(new Point(0, screenHeight - shadowBoss.getPartRec(0).Height));
+                //    //shadowBoss.moveToPoint(new Point(player.getRecX(), player.getRecY()));
+
+                //    for (int j = 0; j < shadowBoss.numParts; j++)
+                //    {
+                //        collideWithPlayer(30, shadowBoss.getPartRec(j));
+                //    }
+                //    //collideWithPlayer(30, shadowBoss.getRec());
+                //    //}
+                //}
             }
 
             endOfTickCode();
@@ -227,7 +229,11 @@ namespace RobotBosses
             //    collideWithPlayer(shadowBoss.damageToInflict, shadowBoss.getPartRec(j));
             //}
             shadowBoss.inflictDamageToPlayer();
-            playerHealthBar.setRecWidth(player.health * 2);
+            playerHealthBar.setRecWidth((int)((double)((double)player.health / (double)player.startingHealth)
+                * (playerHealthBar.getBackground().Width) - playerHealthBar.border * 2));
+            bossHealthBar.setRecWidth((int)((double)((double)shadowBoss.health / (double)shadowBoss.startingHealth) 
+                * (bossHealthBar.getBackground().Width) - bossHealthBar.border * 2));
+            //playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
         }
 
@@ -432,13 +438,13 @@ namespace RobotBosses
             }
 
             int originalPhase = (int)shadowBoss.currentPhase;
-            //while ((int)shadowBoss.currentPhase == originalPhase)
-            //{
-            //    //shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
-            //    shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(0, (int)ShadowBoss.phase.debug);
+            while ((int)shadowBoss.currentPhase == originalPhase)
+            {
+                //shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
+                shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(0, (int)ShadowBoss.phase.debug);
 
-            //}
-            shadowBoss.currentPhase = ShadowBoss.phase.patrol;
+            }
+            //shadowBoss.currentPhase = ShadowBoss.phase.shadowPaths;
             shadowBoss.colorSwitchCount = 10;
         }
 
@@ -644,7 +650,7 @@ namespace RobotBosses
             }
 
 
-            pathMaker.drawCharacter(spriteBatch, Color.Purple);
+            //pathMaker.drawCharacter(spriteBatch, Color.Purple);
 
             for (int i = 0; i < shadowPathList.Count; i++)
             {
@@ -655,14 +661,16 @@ namespace RobotBosses
 
 
             playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30), Color.Black);
-            spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
-            spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
-            spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 80), Color.Green);
-            spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
-            spriteBatch.DrawString(debugFont, "shadowPathStartTime: " + shadowPathStartTime, new Vector2(100,  60), Color.Green);
-            spriteBatch.DrawString(debugFont, "patrolPosX: " + shadowBoss.patrolPos.X + " Y: " + shadowBoss.patrolPos.Y, new Vector2(100,  120), Color.Green);
-            spriteBatch.DrawString(debugFont, "bossHeadX: " + shadowBoss.getPartRec(0).X + "bossHeadY: " + shadowBoss.getPartRec(0).Y,
-                new Vector2(100, screenHeight - 40), Color.Green);
+            bossHealthBar.drawCharacter(spriteBatch, new Color(137, 132, 157), Color.Black);
+            //spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
+            //spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
+            spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 120), Color.Green);
+            spriteBatch.DrawString(debugFont, "Boss Health: " + shadowBoss.health, new Vector2(100, screenHeight - 100), Color.Green);
+            //spriteBatch.DrawString(debugFont, "currentShadowPath: " + currentShadowPathNum, new Vector2(100, screenHeight - 60), Color.Green);
+            //spriteBatch.DrawString(debugFont, "shadowPathStartTime: " + shadowPathStartTime, new Vector2(100,  60), Color.Green);
+            //spriteBatch.DrawString(debugFont, "patrolPosX: " + shadowBoss.patrolPos.X + " Y: " + shadowBoss.patrolPos.Y, new Vector2(100,  120), Color.Green);
+            //spriteBatch.DrawString(debugFont, "bossHeadX: " + shadowBoss.getPartRec(0).X + "bossHeadY: " + shadowBoss.getPartRec(0).Y,
+            //    new Vector2(100, screenHeight - 40), Color.Green);
 
 
 

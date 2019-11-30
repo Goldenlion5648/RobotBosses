@@ -12,12 +12,19 @@ namespace RobotBosses
     class HealthBar : Character
     {
         Rectangle background;
+        public int border { get; set; }
         public HealthBar(ref Texture2D tex, Rectangle rectangle, int border) : base(ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
+            this.border = border;
 
             this.background = new Rectangle(rec.X - border, rec.Y - border, rec.Width + border * 2, rec.Height+ border * 2);
+        }
+
+        public Rectangle getBackground()
+        {
+            return background;
         }
 
         public virtual void drawCharacter(SpriteBatch sb, Color foreground, Color backgroundColor)

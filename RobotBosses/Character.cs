@@ -15,6 +15,7 @@ namespace RobotBosses
         public Texture2D texture;
         public Rectangle rec;
         public int health { get; set; }
+        public int startingHealth { get; set; }
         public int speed { get; set; } = 5;
         public int originalX { get; set; } = 5;
         public int originalY { get; set; } = 5;
