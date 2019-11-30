@@ -461,7 +461,7 @@ namespace RobotBosses
                 shadowBoss.currentPhase = (ShadowBoss.phase)0;
 
 
-            shadowBoss.currentPhase = (ShadowBoss.phase)5;
+            //shadowBoss.currentPhase = (ShadowBoss.phase)5;
 
 
             shadowBoss.colorSwitchCount = 10;
