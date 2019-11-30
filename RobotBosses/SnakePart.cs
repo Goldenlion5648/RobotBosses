@@ -15,6 +15,8 @@ namespace RobotBosses
 
         List<Point> cornerList = new List<Point>();
 
+        public int hitCooldown { get; set; } = 0;
+
         public SnakePart(ref Texture2D tex, Rectangle rectangle)
         {
             this.rec = rectangle;

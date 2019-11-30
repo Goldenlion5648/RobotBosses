@@ -268,6 +268,32 @@ namespace RobotBosses
             }
         }
 
+        public void takeDamage(Projectile projectile)
+        {
+            int partsOnCooldown = 0;
+
+            for (int i = 0; i < numParts; i++)
+            {
+                if(bodyPartList[i].hitCooldown > 0)
+                {
+                    partsOnCooldown++;
+                    bodyPartList[i].hitCooldown--;
+                }
+            }
+
+            for (int i = 0; i < numParts; i++)
+            {
+                if(bodyPartList[i].getRec().Intersects(projectile.getRec()) && bodyPartList[i].hitCooldown == 0)
+                {
+                    if(partsOnCooldown < 4)
+                    {
+                        bodyPartList[i].hitCooldown = 150;
+                        this.health -= 2;
+                    }
+                }
+            }
+        }
+
         public void patrol()
         {
             if (currentPhase != phase.patrol)
@@ -793,6 +819,25 @@ namespace RobotBosses
             }
         }
 
+        public void drawPhases(Color color)
+        {
+            for (int i = 0; i < numParts; i++)
+            {
+                if (bodyPartList[i].hitCooldown > 0)
+                {
+                    if (gameClock % 8 != 0)
+                    {
+                        sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+
+                    }
+                }
+                else
+                {
+                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+                }
+            }
+        }
+
         public void drawCharacter(SpriteBatch sb, int gameClock)
         {
 
@@ -800,34 +845,82 @@ namespace RobotBosses
             //sb.Draw(texture, body, Color.Green);
             //sb.Draw(texture, tail, Color.Blue);
             sb.Draw(texture, rec, Color.White);
+
+
             if (currentPhase == phase.flail)
             {
                 for (int i = 0; i < numParts; i++)
                 {
-                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+                    if (bodyPartList[i].hitCooldown > 0)
+                    {
+                        if (gameClock % 8 != 0)
+                        {
+                            sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+
+                        }
+                    }
+                    else
+                    {
+                        sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i * colorCounter, i));
+                    }
                 }
 
             }
             else if (currentPhase == phase.patrol)
             {
+
                 for (int i = 0; i < numParts; i++)
                 {
+                    if (bodyPartList[i].hitCooldown > 0)
+                    {
+                        if (gameClock % 8 != 0)
+                        {
+                            sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i, i));
+
+                        }
+                    }
+                    else
+                    {
                     sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * colorCounter, i, i));
+                    }
                 }
 
             }
             else if (currentPhase == phase.shadowPaths)
             {
+
                 for (int i = 0; i < numParts; i++)
                 {
+                    if (bodyPartList[i].hitCooldown > 0)
+                    {
+                        if (gameClock % 8 != 0)
+                        {
+                            sb.Draw(texture, bodyPartList[i].getRec(), new Color(i, i, i * colorCounter));
+
+                        }
+                    }
+                    else
+                    {
                     sb.Draw(texture, bodyPartList[i].getRec(), new Color(i, i, i * colorCounter));
+                    }
                 }
+
             }
             else
             {
                 for (int i = 0; i < numParts; i++)
                 {
-                    sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * colorCounter, i));
+                    if (bodyPartList[i].hitCooldown > 0)
+                    {
+                        if (gameClock % 8 != 0)
+                        {
+                            sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * colorCounter, i));
+                        }
+                    }
+                    else
+                    {
+                        sb.Draw(texture, bodyPartList[i].getRec(), new Color(i * 10, i * colorCounter, i));
+                    }
                 }
             }
 

@@ -19,6 +19,7 @@ namespace RobotBosses
         public int speed { get; set; } = 5;
         public int originalX { get; set; } = 5;
         public int originalY { get; set; } = 5;
+        public int hitCooldown { get; set; } = 0;
 
 
         //public Rectangle rec2 { get { return rec2}; set; }

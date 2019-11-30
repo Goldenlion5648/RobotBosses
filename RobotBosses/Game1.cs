@@ -105,7 +105,7 @@ namespace RobotBosses
             player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
-            guardRing = new Ring(ref blankSquare,
+            guardRing = new Ring(Content.Load<Texture2D>("greenLightBall"),
                 new Rectangle(200, 200, playerWidth, playerHeight), ref player);
 
             playerHealthBar = new HealthBar(ref blankSquare, new Rectangle(30, screenHeight - 60, 200, 35), 5);
@@ -233,13 +233,17 @@ namespace RobotBosses
             //{
             //    collideWithPlayer(shadowBoss.damageToInflict, shadowBoss.getPartRec(j));
             //}
+            guardRing.move(gameClock);
+
+            shadowBoss.takeDamage(guardRing);
+
             shadowBoss.inflictDamageToPlayer();
+
             playerHealthBar.setRecWidth((int)((double)((double)player.health / (double)player.startingHealth)
                 * (playerHealthBar.getBackground().Width) - playerHealthBar.border * 2));
             bossHealthBar.setRecWidth((int)((double)((double)shadowBoss.health / (double)shadowBoss.startingHealth) 
                 * (bossHealthBar.getBackground().Width) - bossHealthBar.border * 2));
 
-            guardRing.move(gameClock);
             //playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
         }
@@ -683,7 +687,7 @@ namespace RobotBosses
             playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30, alpha), new Color(0,0,0, alpha));
             bossHealthBar.drawCharacter(spriteBatch, new Color(137, 132, 157, alpha), new Color(0, 0, 0, alpha));
 
-            guardRing.drawCharacter(spriteBatch, Color.Green);
+            guardRing.drawCharacter(spriteBatch, Color.White);
             
             //spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
             //spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);

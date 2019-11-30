@@ -11,7 +11,7 @@ namespace RobotBosses
 {
     class Player: Character
     {
-        public int hitCooldown { get; set; }
+        //public int hitCooldown { get; set; }
 
         public Player(ref Texture2D tex, Rectangle rectangle) : base( ref tex, rectangle)
         {

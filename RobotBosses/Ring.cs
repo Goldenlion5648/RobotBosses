@@ -12,7 +12,7 @@ namespace RobotBosses
     class Ring : Projectile, IProjectile
     {
         Player player;
-        public Ring(ref Texture2D tex, Rectangle rectangle, ref Player player) : base(ref tex, rectangle)
+        public Ring(Texture2D tex, Rectangle rectangle, ref Player player) : base(ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
@@ -24,7 +24,7 @@ namespace RobotBosses
         {
             float time = gameClock; 
             float speed = MathHelper.Pi / 32; 
-            float radius = 150.0f;
+            float radius = 120.0f;
             Vector2 origin = player.getRec().Center.ToVector2(); 
 
 
