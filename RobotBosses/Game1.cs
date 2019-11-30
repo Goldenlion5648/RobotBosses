@@ -4,6 +4,8 @@ using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Media;
 
 namespace RobotBosses
 {
@@ -23,6 +25,8 @@ namespace RobotBosses
         SpriteFont debugFont;
         
         KeyboardState kb, oldkb;
+        //SoundEffect backgroundMusic;
+        Song backgroundMusic;
 
         MouseState ms;
         Point mousePos;
@@ -101,6 +105,10 @@ namespace RobotBosses
             debugFont = Content.Load<SpriteFont>("debugFont");
 
             blankSquare = Content.Load<Texture2D>("blankSquare");
+
+            backgroundMusic = Content.Load<Song>("snakeBoss3");
+            
+            
 
             player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
@@ -216,6 +224,8 @@ namespace RobotBosses
 
         public void endOfTickCode()
         {
+            if (MediaPlayer.State == MediaState.Stopped)
+                MediaPlayer.Play(backgroundMusic);
 
             if (player.hitCooldown > 0)
             {
@@ -233,6 +243,14 @@ namespace RobotBosses
             //{
             //    collideWithPlayer(shadowBoss.damageToInflict, shadowBoss.getPartRec(j));
             //}
+
+            if(player.health < player.startingHealth && player.health > 0)
+            {
+                if(gameClock % 60 == 0)
+                {
+                    player.health++;
+                }
+            }
             guardRing.move(gameClock);
 
             shadowBoss.takeDamage(guardRing);
@@ -649,7 +667,7 @@ namespace RobotBosses
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(new Color(5, 10, 5));
 
             spriteBatch.Begin();
 
@@ -674,11 +692,11 @@ namespace RobotBosses
             }
 
 
-            //pathMaker.drawCharacter(spriteBatch, Color.Purple);
+            pathMaker.drawCharacter(spriteBatch, new Color(20, 20, 30));
 
             for (int i = 0; i < shadowPathList.Count; i++)
             {
-                shadowPathList[i].drawCharacter(spriteBatch, Color.Black);
+                shadowPathList[i].drawCharacter(spriteBatch, new Color(40, 20, 40));
             }
 
 
