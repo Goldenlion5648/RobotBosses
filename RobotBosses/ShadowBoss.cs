@@ -170,26 +170,32 @@ namespace RobotBosses
                 straightenInPlace();
                 phaseCooldown = 1000;
             }
-            if(bodyPartList[numParts - 1].getRecX() > (numParts - 1) * partDimension + startingPos.X)
+            //if(bodyPartList[numParts - 1].getRecX() > (numParts - 1) * partDimension + startingPos.X)
+            if (phaseCooldown > 998)
             {
-                for (int i = 0; i < speed; i++)
+                if (new Point(bodyPartList[0].getRecX(), bodyPartList[0].getRecY()) != startingPos)
                 {
-                    hasMovedInTick = false;
-                    moveToPoint(startingPos);
-                    if (bodyPartList[numParts - 2].getRecX() - 2 == (numParts - 1) * partDimension + startingPos.X)
+                    for (int i = 0; i < speed; i++)
                     {
-                        //resetPos();
-                        return;
+                        hasMovedInTick = false;
+                        moveToPoint(startingPos);
+                        if (bodyPartList[numParts - 2].getRecX() - 2 == (numParts - 1) * partDimension + startingPos.X)
+                        {
+                            //resetPos();
+                            return;
+                        }
+
                     }
+                    phaseCooldown += 1;
+                    return;
 
                 }
-                phaseCooldown += 1;
-                return;
-
-            }
-            else
-            {
-                resetPos();
+                else
+                {
+                    resetPos();
+                    straightenInPlace();
+                    spaceOut();
+                }
             }
             if (colorSwitchCount < 3)
             {
@@ -511,6 +517,14 @@ namespace RobotBosses
             for (int i = 0; i < numParts; i++)
             {
                 bodyPartList[i] = (new SnakePart(new Rectangle(startingPos.X + partDimension * i, startingPos.Y, partDimension, partDimension)));
+            }
+        }
+
+        public void spaceOut()
+        {
+            for (int i = 1; i < numParts; i++)
+            {
+                bodyPartList[i].setRecX(bodyPartList[i - 1].getRec().Right);
             }
         }
 

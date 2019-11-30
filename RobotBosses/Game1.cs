@@ -39,6 +39,8 @@ namespace RobotBosses
         HealthBar bossHealthBar;
         HealthBar playerHealthBar;
 
+        Ring guardRing;
+
         Enemy pathMaker;
 
 
@@ -102,6 +104,9 @@ namespace RobotBosses
 
             player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
+
+            guardRing = new Ring(ref blankSquare,
+                new Rectangle(200, 200, playerWidth, playerHeight), ref player);
 
             playerHealthBar = new HealthBar(ref blankSquare, new Rectangle(30, screenHeight - 60, 200, 35), 5);
             bossHealthBar = new HealthBar(ref blankSquare, new Rectangle(screenWidth / 2 + 30, screenHeight - 60, 400, 35), 5);
@@ -233,6 +238,8 @@ namespace RobotBosses
                 * (playerHealthBar.getBackground().Width) - playerHealthBar.border * 2));
             bossHealthBar.setRecWidth((int)((double)((double)shadowBoss.health / (double)shadowBoss.startingHealth) 
                 * (bossHealthBar.getBackground().Width) - bossHealthBar.border * 2));
+
+            guardRing.move(gameClock);
             //playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
         }
@@ -438,13 +445,21 @@ namespace RobotBosses
             }
 
             int originalPhase = (int)shadowBoss.currentPhase;
-            while ((int)shadowBoss.currentPhase == originalPhase)
-            {
-                //shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
-                shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(0, (int)ShadowBoss.phase.debug);
+            //while ((int)shadowBoss.currentPhase == originalPhase)
+            //{
+            //    //shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(1, (int)ShadowBoss.phase.debug);
+            //    shadowBoss.currentPhase = (ShadowBoss.phase)rand.Next(0, (int)ShadowBoss.phase.debug);
 
-            }
-            //shadowBoss.currentPhase = ShadowBoss.phase.shadowPaths;
+            //}
+
+            shadowBoss.currentPhase = (ShadowBoss.phase)((int)shadowBoss.currentPhase + 1);
+            if ((int)shadowBoss.currentPhase >= (int)ShadowBoss.phase.debug)
+                shadowBoss.currentPhase = (ShadowBoss.phase)0;
+
+
+            shadowBoss.currentPhase = (ShadowBoss.phase)5;
+
+
             shadowBoss.colorSwitchCount = 10;
         }
 
@@ -619,6 +634,11 @@ namespace RobotBosses
             }
         }
 
+        public void useWeapon()
+        {
+            
+        }
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -658,10 +678,13 @@ namespace RobotBosses
             }
 
 
+            int alpha = 160;
 
+            playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30, alpha), new Color(0,0,0, alpha));
+            bossHealthBar.drawCharacter(spriteBatch, new Color(137, 132, 157, alpha), new Color(0, 0, 0, alpha));
 
-            playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30), Color.Black);
-            bossHealthBar.drawCharacter(spriteBatch, new Color(137, 132, 157), Color.Black);
+            guardRing.drawCharacter(spriteBatch, Color.Green);
+            
             //spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
             //spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 120), Color.Green);
