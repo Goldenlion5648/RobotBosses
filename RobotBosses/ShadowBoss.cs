@@ -61,7 +61,7 @@ namespace RobotBosses
         public bool shouldMoveToPoint { get; set; } = false;
 
         public bool hasFinishedMoving { get; set; }
-
+        
         private int colorCounter = 0;
         private bool colorCountUp = true;
 
@@ -70,7 +70,7 @@ namespace RobotBosses
         public int phaseCooldown { get; set; } = 0;
 
         int partsOnCooldown = 0;
-        public int maxPossiblePartsOnCooldown { get; set; } = 4;
+        public int maxPossiblePartsOnCooldown { get; set; } = 5;
         //private int colorSwitchCount = 10;
 
 
@@ -280,11 +280,12 @@ namespace RobotBosses
             {
                 if (bodyPartList[i].getRec().Intersects(projectile.getRec()) && bodyPartList[i].hitCooldown == 0)
                 {
-                    if (partsOnCooldown < maxPossiblePartsOnCooldown)
+                    if (partsOnCooldown <= maxPossiblePartsOnCooldown)
                     {
-                        bodyPartList[i].hitCooldown = 150;
+                        bodyPartList[i].hitCooldown = 60;
                         this.health -= projectile.damage;
                     }
+
                 }
             }
         }

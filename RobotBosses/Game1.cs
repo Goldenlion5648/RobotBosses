@@ -52,11 +52,13 @@ namespace RobotBosses
         Enemy pathMaker;
 
         bool colorCountingUp = true;
-        int colorNum = 0;
+        int colorNum = 30;
 
 
         public static int screenWidth = 1080;
         public static int screenHeight = 720;
+
+        public static int lightCooldown = 0;
 
         int playerHeight = 60;
         int playerWidth = 40;
@@ -69,7 +71,7 @@ namespace RobotBosses
 
         enum gameState
         {
-            levelSelect, shadowBoss, titleScreen
+           shadowBoss, titleScreen, lose, win
         }
 
         gameState state = gameState.shadowBoss;
@@ -164,9 +166,6 @@ namespace RobotBosses
                 Exit();
             switch (state)
             {
-                case gameState.levelSelect:
-
-                    break;
                 case gameState.shadowBoss:
                     shadowBossLevel();
                     break;
@@ -190,6 +189,16 @@ namespace RobotBosses
             {
                 state = gameState.shadowBoss;
             }
+        }
+
+        public void win()
+        {
+
+        }
+
+        public void lose()
+        {
+
         }
 
         public void shadowBossLevel()
@@ -233,7 +242,7 @@ namespace RobotBosses
             {
                 if (player.hitCooldown == 0)
                 {
-                    player.hitCooldown = 120;
+                    player.hitCooldown = 180;
                     player.health -= damage;
                 }
 
@@ -244,7 +253,7 @@ namespace RobotBosses
 
         public void collectableCode()
         {
-            if (gameClock != 0 && gameClock % 450 == 0)
+            if (gameClock != 0 && gameClock % 360 == 0)
             {
                 collectables.Add(new Collectable(ref potionBottle, new Rectangle(rand.Next(0, screenWidth - playerWidth),
                     rand.Next(0, screenHeight - playerWidth), playerWidth, playerWidth), ref player));
@@ -306,16 +315,46 @@ namespace RobotBosses
             if (player.currentWeapon == Player.weapon.ring)
             {
                 guardRing.move(gameClock);
-
-            shadowBoss.takeDamage(guardRing);
+                shadowBoss.takeDamage(guardRing);
+                if (player.weaponCooldown > 0)
+                    player.weaponCooldown--;
+                if (player.weaponCooldown == 0)
+                    player.currentWeapon = Player.weapon.fist;
             }
 
-            shadowBoss.inflictDamageToPlayer();
+            if (lightCooldown > 0)
+            {
+                lightCooldown--;
+                if (gameClock % 30 == 0)
+                    shadowBoss.health--;
+            }
 
-            playerHealthBar.setRecWidth((int)((double)((double)player.health / (double)player.startingHealth)
-                * (playerHealthBar.getBackground().Width) - playerHealthBar.border * 2));
-            bossHealthBar.setRecWidth((int)((double)((double)shadowBoss.health / (double)shadowBoss.startingHealth) 
-                * (bossHealthBar.getBackground().Width) - bossHealthBar.border * 2));
+            if (player.speedCooldown > 0)
+                player.speedCooldown--;
+
+            if (player.speedCooldown == 0)
+                player.speed = player.startingSpeed;
+
+            shadowBoss.inflictDamageToPlayer();
+            if (player.health < 7)
+            {
+                playerHealthBar.setRecWidth(player.health);
+            }
+            else
+            {
+                playerHealthBar.setRecWidth((int)((double)((double)player.health / (double)player.startingHealth)
+                    * (playerHealthBar.getBackground().Width) - playerHealthBar.border * 2));
+            }
+
+            if (shadowBoss.health < 10)
+            {
+                bossHealthBar.setRecWidth(shadowBoss.health);
+            }
+            else
+            {
+                bossHealthBar.setRecWidth((int)((double)((double)shadowBoss.health / (double)shadowBoss.startingHealth)
+                    * (bossHealthBar.getBackground().Width) - bossHealthBar.border * 2));
+            }
 
             //playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
@@ -722,17 +761,27 @@ namespace RobotBosses
         {
             GraphicsDevice.Clear(Color.Black);
 
-
             drawText("Press Enter To Start", screenWidth, screenHeight, Color.White);
-
-            
 
             //spriteBatch.DrawString(debugFont, "Test", new Vector2(200, 0), Color.Green);
 
         }
 
+        public void drawWin()
+        {
+            GraphicsDevice.Clear(Color.Black);
+
+            drawText("You ran out of health!", screenWidth, screenHeight, Color.White);
+        }
+
+        public void drawLose()
+        {
+
+        }
+
         public void drawShadowBossLevel()
         {
+            
             if (gameClock % 600 == 0)
                 colorCountingUp = !colorCountingUp;
 
@@ -744,8 +793,16 @@ namespace RobotBosses
                     colorNum--;
             }
 
+            if (lightCooldown > 0)
+            {
+                GraphicsDevice.Clear(Color.LightGray);
+                    
+            }
+            else
+            {
+                GraphicsDevice.Clear(new Color(colorNum * 2, colorNum * 2, colorNum * 2));
 
-            GraphicsDevice.Clear(new Color(colorNum, colorNum, colorNum));
+            }
 
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
@@ -820,14 +877,17 @@ namespace RobotBosses
 
             switch (state)
             {
-                case gameState.levelSelect:
-
-                    break;
                 case gameState.shadowBoss:
                     drawShadowBossLevel();
                     break;
                 case gameState.titleScreen:
                     drawTitleScreen();
+                    break;
+                case gameState.win:
+                    drawWin();
+                    break;
+                case gameState.lose:
+                    drawLose();
                     break;
 
             }

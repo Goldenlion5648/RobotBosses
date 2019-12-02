@@ -53,6 +53,7 @@ namespace RobotBosses
             {
                 case collectableType.ring:
                     player.currentWeapon = Player.weapon.ring;
+                    player.weaponCooldown = 570;
                     break;
                 case collectableType.healthPack:
                     player.health += 20;
@@ -62,9 +63,10 @@ namespace RobotBosses
                 case collectableType.speed:
                     player.speed = player.startingSpeed;
                     player.speed += 3;
+                    player.speedCooldown = 700;
                     break;
                 case collectableType.lights:
-                    
+                    Game1.lightCooldown = 600;
                     break;
             }
             return true;
