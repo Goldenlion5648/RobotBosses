@@ -12,18 +12,19 @@ namespace RobotBosses
     class Ring : Projectile, IProjectile
     {
         Player player;
-        public Ring(Texture2D tex, Rectangle rectangle, ref Player player) : base(ref tex, rectangle)
+        public Ring(Texture2D tex, Rectangle rectangle, ref Player player, int damage) : base(ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;
             this.player = player;
+            this.damage = damage;
             //this.startingHealth = 100;
         }
 
         public override void move(int gameClock)
         {
             float time = gameClock; 
-            float speed = MathHelper.Pi / 32; 
+            float speed = MathHelper.Pi / 48; 
             float radius = 120.0f;
             Vector2 origin = player.getRec().Center.ToVector2(); 
 

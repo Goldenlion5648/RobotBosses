@@ -22,6 +22,7 @@ namespace RobotBosses
         Random rand = new Random();
 
         Texture2D blankSquare;
+        Texture2D potionBottle;
         SpriteFont debugFont;
         
         KeyboardState kb, oldkb;
@@ -43,6 +44,9 @@ namespace RobotBosses
         HealthBar bossHealthBar;
         HealthBar playerHealthBar;
 
+        List<Collectable> collectables = new List<Collectable>();
+        //Collectable collectableItem;
+
         Ring guardRing;
 
         Enemy pathMaker;
@@ -59,6 +63,8 @@ namespace RobotBosses
 
         int currentShadowPathNum = -1;
         int shadowPathStartTime = 0;
+
+        int maxTimeCollectableOnScreen = 600;
 
 
         enum gameState
@@ -108,16 +114,18 @@ namespace RobotBosses
             debugFont = Content.Load<SpriteFont>("debugFont");
 
             blankSquare = Content.Load<Texture2D>("blankSquare");
+            potionBottle = Content.Load<Texture2D>("potionBottle");
 
             backgroundMusic = Content.Load<Song>("snakeBoss3");
-            
-            
 
             player = new Player(ref blankSquare,
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
+            //collectableItem = new Collectable(ref potionBottle,
+            //    new Rectangle(200, 200, playerWidth, playerWidth), ref player);
+
             guardRing = new Ring(Content.Load<Texture2D>("greenLightBall"),
-                new Rectangle(200, 200, playerWidth, playerWidth), ref player);
+                new Rectangle(200, 200, playerWidth, playerWidth), ref player, 2);
 
             playerHealthBar = new HealthBar(ref blankSquare, new Rectangle(30, screenHeight - 60, 200, 35), 5);
             bossHealthBar = new HealthBar(ref blankSquare, new Rectangle(screenWidth / 2 + 30, screenHeight - 60, 400, 35), 5);
@@ -234,10 +242,45 @@ namespace RobotBosses
 
         }
 
+        public void collectableCode()
+        {
+            if (gameClock != 0 && gameClock % 450 == 0)
+            {
+                collectables.Add(new Collectable(ref potionBottle, new Rectangle(rand.Next(0, screenWidth - playerWidth),
+                    rand.Next(0, screenHeight - playerWidth), playerWidth, playerWidth), ref player));
+                collectables[collectables.Count - 1].typeOfCollectable =
+                    (Collectable.collectableType)rand.Next(0, (int)(Collectable.collectableType.lights + 1));
+                //collectableItem.timeExisted = 0;
+                //collectableItem.setRecX(rand.Next(0, screenWidth - collectableItem.getRec().Width));
+                //collectableItem.setRecY(rand.Next(0, screenHeight - collectableItem.getRec().Height));
+                //player.currentWeapon = Player.weapon.fist;
+            }
+
+
+            for (int i = 0; i < collectables.Count; i++)
+            {
+                if (collectables[i].onCollect())
+                {
+                    collectables.RemoveAt(i);
+                    continue;
+                }
+
+                collectables[i].timeExisted++;
+                if(collectables[i].timeExisted >= maxTimeCollectableOnScreen)
+                {
+                    collectables.RemoveAt(i);
+                }
+
+            }
+
+        }
+
         public void endOfTickCode()
         {
             if (MediaPlayer.State == MediaState.Stopped)
                 MediaPlayer.Play(backgroundMusic);
+
+            collectableCode();
 
             if (player.hitCooldown > 0)
             {
@@ -251,11 +294,6 @@ namespace RobotBosses
                 changeToNewPhase();
             }
 
-            //for (int j = 0; j < shadowBoss.numParts; j++)
-            //{
-            //    collideWithPlayer(shadowBoss.damageToInflict, shadowBoss.getPartRec(j));
-            //}
-
             if(player.health < player.startingHealth && player.health > 0)
             {
                 if(gameClock % 60 == 0)
@@ -263,9 +301,14 @@ namespace RobotBosses
                     player.health++;
                 }
             }
-            guardRing.move(gameClock);
+
+
+            if (player.currentWeapon == Player.weapon.ring)
+            {
+                guardRing.move(gameClock);
 
             shadowBoss.takeDamage(guardRing);
+            }
 
             shadowBoss.inflictDamageToPlayer();
 
@@ -729,10 +772,30 @@ namespace RobotBosses
 
             int alpha = 200;
 
-            playerHealthBar.drawCharacter(spriteBatch, new Color(255, 0, 0, alpha), new Color(10, 20, 180, alpha));
-            bossHealthBar.drawCharacter(spriteBatch, new Color(40, 100, 157, alpha), new Color(200, 200, 255, alpha));
+            playerHealthBar.drawCharacter(spriteBatch, new Color(255, 0, 0, alpha), new Color(10, 50, 150, alpha));
+            bossHealthBar.drawCharacter(spriteBatch, new Color(128, 128, 157, alpha), new Color(200, 200, 255, alpha));
 
-            guardRing.drawCharacter(spriteBatch, Color.White);
+            if (player.currentWeapon == Player.weapon.ring)
+            {
+                guardRing.drawCharacter(spriteBatch, Color.White);
+            }
+
+            for (int i = 0; i < collectables.Count; i++)
+            {
+                if (maxTimeCollectableOnScreen - collectables[i].timeExisted > 120)
+                {
+                    collectables[i].drawCharacter(spriteBatch, collectables[i].getColor());
+                }
+                else
+                {
+                    if(gameClock % 8 != 0)
+                    {
+                        collectables[i].drawCharacter(spriteBatch, collectables[i].getColor());
+
+                    }
+                }
+
+            }
 
             //spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
             //spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);

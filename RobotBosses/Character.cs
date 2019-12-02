@@ -17,6 +17,7 @@ namespace RobotBosses
         public int health { get; set; }
         public int startingHealth { get; set; }
         public int speed { get; set; } = 5;
+        public int startingSpeed { get; set; } = 5;
         public int originalX { get; set; } = 5;
         public int originalY { get; set; } = 5;
         public int hitCooldown { get; set; } = 0;

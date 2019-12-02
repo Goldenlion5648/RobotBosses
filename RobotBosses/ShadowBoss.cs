@@ -70,7 +70,7 @@ namespace RobotBosses
         public int phaseCooldown { get; set; } = 0;
 
         int partsOnCooldown = 0;
-        public int maxPossiblePartsOnCooldown { get; set; } = 7;
+        public int maxPossiblePartsOnCooldown { get; set; } = 4;
         //private int colorSwitchCount = 10;
 
 
@@ -283,7 +283,7 @@ namespace RobotBosses
                     if (partsOnCooldown < maxPossiblePartsOnCooldown)
                     {
                         bodyPartList[i].hitCooldown = 150;
-                        this.health -= 2;
+                        this.health -= projectile.damage;
                     }
                 }
             }

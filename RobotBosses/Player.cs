@@ -12,6 +12,13 @@ namespace RobotBosses
     class Player: Character
     {
         //public int hitCooldown { get; set; }
+        public enum weapon
+        {
+            fist, ring, 
+        }
+
+        public weapon currentWeapon { get; set; } = weapon.fist;
+
 
         public Player(ref Texture2D tex, Rectangle rectangle) : base( ref tex, rectangle)
         {
