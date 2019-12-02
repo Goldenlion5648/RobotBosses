@@ -97,14 +97,6 @@ namespace RobotBosses
 
         }
 
-        //public ShadowBoss(Texture2D tex, Rectangle head, Rectangle body, Rectangle tail) : base()
-        //{
-        //    this.texture = tex;
-        //    this.head = head;
-        //    this.body = body;
-        //    this.tail = tail;
-        //}
-
         public SnakePart getPart(int index)
         {
             return bodyPartList[index];
@@ -358,18 +350,7 @@ namespace RobotBosses
                     patrolPos = new Point(bodyPartList[0].getRecX(), player.getRecY());
                 }
 
-                //patrolPos = new Point(player.getRecX(), player.getRecY());
-                //if (player.getRecX() > Game1.screenWidth / 2)
-                //{
-                //    patrolPos = new Point(Game1.screenWidth / 2, player.getRecY());
-                //}
-                //else
-                //{
-                //    patrolPos = new Point(player.getRecX(), player.getRecY());
-                //}
             }
-
-
 
         }
 
@@ -395,13 +376,7 @@ namespace RobotBosses
                 }
                 hasSetUpMoving = true;
                 currentYPart = 0;
-                //for (int i = 0; i < speed; i++)
-                //{
-                //    if (bodyPartList[0].getRec().Y != destination.Y)
-                //    {
-                //        bodyPartList[0].incrementRecY(displacement);
-                //    }
-                //}
+
             }
 
 
@@ -422,19 +397,12 @@ namespace RobotBosses
                     //bodyPartList[j].incrementRecX(xDirection * 3);
                 }
             }
-            //if (hasMovedInTick == false)
-            //{
-            //for (int i = 0; i < speed; i++)
-            //{
+
 
             if (bodyPartList[0].getRec().X != destination.X)
             {
                 bodyPartList[0].incrementRecX(xDirection);
             }
-
-            //    }
-            //}
-
 
             int yDirection = -1;
             if ((destination.Y - bodyPartList[0].getRecY()) < 0)
@@ -480,36 +448,8 @@ namespace RobotBosses
                     hasSetUpMoving = false;
                 }
 
-                //if (isDone)
-                //{
-                //    currentYPart = 1;
-                //}
-                //else
-                //{
-                //if (currentYPart < numParts)
-                //{
-                //    currentYPart++;
-                //}
-                //if (currentYPart == numParts)
-                //{
-                //    currentYPart = 1;
-                //}
-                //}
             }
-            //else
-            //{
-            //    //yDirection = yDirection * 2;
-            //    //bodyPartList[currentYPart].incrementRecY(yDirection * (numParts - currentYPart));
 
-            //    for (int j = numParts - 1; j >= 1; j--)
-            //    {
-            //        //for (int i = 0; i < speed; i++)
-            //        //{
-            //        //bodyPartList[j].setRecY(bodyPartList[j - 1].getRecY() - (yDirection * 10));
-            //        bodyPartList[j].incrementRecY((yDirection));
-            //        //}
-            //    }
-            //}
 
             if (currentYPart < numParts)
             {
@@ -527,17 +467,6 @@ namespace RobotBosses
             else
                 yDirection = 0;
 
-            //if (hasMovedInTick == false)
-            //{
-            //for (int i = 0; i < speed; i++)
-            //{
-            //    if (bodyPartList[0].getRec().Y != destination.Y)
-            //    {
-            //        bodyPartList[0].incrementRecY(yDirection);
-            //    }
-            //}
-            //hasMovedInTick = true;
-            //}
         }
 
         public void resetPosition()

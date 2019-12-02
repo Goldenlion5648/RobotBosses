@@ -47,6 +47,9 @@ namespace RobotBosses
 
         Enemy pathMaker;
 
+        bool colorCountingUp = true;
+        int colorNum = 0;
+
 
         public static int screenWidth = 1080;
         public static int screenHeight = 720;
@@ -60,7 +63,7 @@ namespace RobotBosses
 
         enum gameState
         {
-            levelSelect, shadowBoss
+            levelSelect, shadowBoss, titleScreen
         }
 
         gameState state = gameState.shadowBoss;
@@ -114,7 +117,7 @@ namespace RobotBosses
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
             guardRing = new Ring(Content.Load<Texture2D>("greenLightBall"),
-                new Rectangle(200, 200, playerWidth, playerHeight), ref player);
+                new Rectangle(200, 200, playerWidth, playerWidth), ref player);
 
             playerHealthBar = new HealthBar(ref blankSquare, new Rectangle(30, screenHeight - 60, 200, 35), 5);
             bossHealthBar = new HealthBar(ref blankSquare, new Rectangle(screenWidth / 2 + 30, screenHeight - 60, 400, 35), 5);
@@ -160,16 +163,25 @@ namespace RobotBosses
                     shadowBossLevel();
                     break;
 
+                case gameState.titleScreen:
+                    titleScreen();
+                    break;
 
             }
-
-
 
             // TODO: Add your update logic here
 
             oldkb = kb;
             // player.Update(gameTime);
             base.Update(gameTime);
+        }
+
+        public void titleScreen()
+        {
+            if (kb.IsKeyDown(Keys.Enter) && oldkb.IsKeyUp(Keys.Enter))
+            {
+                state = gameState.shadowBoss;
+            }
         }
 
         public void shadowBossLevel()
@@ -270,11 +282,6 @@ namespace RobotBosses
         {
             if (shadowBoss.currentPhase != ShadowBoss.phase.shadowPaths)
                 return;
-
-            //else
-            //{
-            //    shadowBoss.currentPhase = ShadowBoss.phase.shadowPaths;
-            //}
 
             if(shadowPathStartTime == 0)
             {
@@ -661,17 +668,41 @@ namespace RobotBosses
             
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
-        protected override void Draw(GameTime gameTime)
+        public void drawText(string text, int centerX, int centerY, Color color)
         {
-            GraphicsDevice.Clear(new Color(5, 10, 5));
+            Vector2 fontSize = debugFont.MeasureString(text);
+            spriteBatch.DrawString(debugFont, text, new Vector2(centerX / 2 - fontSize.X / 2, centerY /2 - fontSize.Y / 2), color);
+            //spriteBatch.DrawString(debugFont, fontWidth.ToString(), new Vector2(100,0), Color.Green);
+        }
 
-            spriteBatch.Begin();
+        public void drawTitleScreen()
+        {
+            GraphicsDevice.Clear(Color.Black);
 
 
+            drawText("Press Enter To Start", screenWidth, screenHeight, Color.White);
+
+            
+
+            //spriteBatch.DrawString(debugFont, "Test", new Vector2(200, 0), Color.Green);
+
+        }
+
+        public void drawShadowBossLevel()
+        {
+            if (gameClock % 600 == 0)
+                colorCountingUp = !colorCountingUp;
+
+            if (gameClock % 10 == 0)
+            {
+                if (colorCountingUp)
+                    colorNum++;
+                else
+                    colorNum--;
+            }
+
+
+            GraphicsDevice.Clear(new Color(colorNum, colorNum, colorNum));
 
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
             //shadowBoss.drawCharacter(spriteBatch, Color.Black);
@@ -682,15 +713,12 @@ namespace RobotBosses
                 if (gameClock % 8 != 0)
                 {
                     player.drawCharacter(spriteBatch, Color.Red);
-
                 }
             }
             else
             {
                 player.drawCharacter(spriteBatch, Color.Red);
-
             }
-
 
             pathMaker.drawCharacter(spriteBatch, new Color(20, 20, 30));
 
@@ -699,14 +727,13 @@ namespace RobotBosses
                 shadowPathList[i].drawCharacter(spriteBatch, new Color(40, 20, 40));
             }
 
+            int alpha = 200;
 
-            int alpha = 160;
-
-            playerHealthBar.drawCharacter(spriteBatch, new Color(220, 60, 30, alpha), new Color(0,0,0, alpha));
-            bossHealthBar.drawCharacter(spriteBatch, new Color(137, 132, 157, alpha), new Color(0, 0, 0, alpha));
+            playerHealthBar.drawCharacter(spriteBatch, new Color(255, 0, 0, alpha), new Color(10, 20, 180, alpha));
+            bossHealthBar.drawCharacter(spriteBatch, new Color(40, 100, 157, alpha), new Color(200, 200, 255, alpha));
 
             guardRing.drawCharacter(spriteBatch, Color.White);
-            
+
             //spriteBatch.DrawString(debugFont, "MouseX: " + mousePos.X + "MouseY: " + mousePos.Y, new Vector2(100, screenHeight - 120), Color.Green);
             //spriteBatch.DrawString(debugFont, "Hitcooldown: " + player.hitCooldown, new Vector2(100, screenHeight - 100), Color.Green);
             spriteBatch.DrawString(debugFont, "Health: " + player.health, new Vector2(100, screenHeight - 120), Color.Green);
@@ -716,8 +743,31 @@ namespace RobotBosses
             //spriteBatch.DrawString(debugFont, "patrolPosX: " + shadowBoss.patrolPos.X + " Y: " + shadowBoss.patrolPos.Y, new Vector2(100,  120), Color.Green);
             //spriteBatch.DrawString(debugFont, "bossHeadX: " + shadowBoss.getPartRec(0).X + "bossHeadY: " + shadowBoss.getPartRec(0).Y,
             //    new Vector2(100, screenHeight - 40), Color.Green);
+        }
 
+        /// <summary>
+        /// This is called when the game should draw itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        protected override void Draw(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
+            spriteBatch.Begin();
+
+            switch (state)
+            {
+                case gameState.levelSelect:
+
+                    break;
+                case gameState.shadowBoss:
+                    drawShadowBossLevel();
+                    break;
+                case gameState.titleScreen:
+                    drawTitleScreen();
+                    break;
+
+            }
 
             spriteBatch.End();
 
