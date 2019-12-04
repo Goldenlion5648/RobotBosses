@@ -12,7 +12,7 @@ namespace RobotBosses
     class Ring : Projectile, IProjectile
     {
         Player player;
-        public Ring(Texture2D tex, Rectangle rectangle, ref Player player, int damage) : base(ref tex, rectangle)
+        public Ring(ref Texture2D tex, Rectangle rectangle, ref Player player, int damage) : base(ref tex, rectangle)
         {
             this.rec = rectangle;
             this.texture = tex;

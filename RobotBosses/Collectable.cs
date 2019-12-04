@@ -56,9 +56,16 @@ namespace RobotBosses
                     player.weaponCooldown = 570;
                     break;
                 case collectableType.healthPack:
-                    player.health += 20;
-                    if (player.health > player.startingHealth)
-                        player.health = player.startingHealth;
+                    if (player.health < player.startingHealth)
+                    {
+                        player.health += 20;
+                        if (player.health > player.startingHealth)
+                            player.health = player.startingHealth;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                     break;
                 case collectableType.speed:
                     player.speed = player.startingSpeed;
@@ -66,7 +73,7 @@ namespace RobotBosses
                     player.speedCooldown = 700;
                     break;
                 case collectableType.lights:
-                    Game1.lightCooldown = 600;
+                    Game1.lightCooldown = 300;
                     break;
             }
             return true;

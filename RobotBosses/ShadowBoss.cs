@@ -37,6 +37,7 @@ namespace RobotBosses
         public bool hasMovedInTick { get; set; } = false;
 
         Player player;
+        Ring ringProjectile;
 
         List<SnakePart> bodyPartList = new List<SnakePart>();
         public int numParts { get; set; } = 16;
@@ -70,7 +71,7 @@ namespace RobotBosses
         public int phaseCooldown { get; set; } = 0;
 
         int partsOnCooldown = 0;
-        public int maxPossiblePartsOnCooldown { get; set; } = 5;
+        public int maxPossiblePartsOnCooldown { get; set; } = 4;
         //private int colorSwitchCount = 10;
 
 
@@ -80,7 +81,7 @@ namespace RobotBosses
         public int patrolCooldown { get; set; } = 0;
         //private Point startingPos;
 
-        public ShadowBoss(ref Texture2D tex, Point startingPos, ref Player player)
+        public ShadowBoss(ref Texture2D tex, Point startingPos, ref Player player, ref Ring ringProjectile)
         {
             //this.rec = rectangle;
             this.texture = tex;
@@ -89,6 +90,7 @@ namespace RobotBosses
             this.speed = 6;
             this.player = player;
             this.startingPos = startingPos;
+            this.ringProjectile = ringProjectile;
 
             for (int i = 0; i < numParts; i++)
             {
@@ -131,6 +133,7 @@ namespace RobotBosses
                 {
                     bodyPartList[i].incrementRecY(-1);
                     inflictDamageToPlayer();
+                    takeDamage(ringProjectile);
 
                 }
             }
@@ -272,7 +275,6 @@ namespace RobotBosses
                 if (bodyPartList[i].hitCooldown > 0)
                 {
                     partsOnCooldown++;
-                    bodyPartList[i].hitCooldown--;
                 }
             }
 
@@ -282,7 +284,7 @@ namespace RobotBosses
                 {
                     if (partsOnCooldown <= maxPossiblePartsOnCooldown)
                     {
-                        bodyPartList[i].hitCooldown = 60;
+                        bodyPartList[i].hitCooldown = 120;
                         this.health -= projectile.damage;
                     }
 

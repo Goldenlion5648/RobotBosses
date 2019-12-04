@@ -17,6 +17,7 @@ namespace RobotBosses
             fist, ring, 
         }
 
+
         public int weaponCooldown { get; set; } = 0;
         public int speedCooldown { get; set; } = 0;
 

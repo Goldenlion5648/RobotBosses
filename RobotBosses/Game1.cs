@@ -23,7 +23,11 @@ namespace RobotBosses
 
         Texture2D blankSquare;
         Texture2D potionBottle;
-        SpriteFont debugFont;
+        Texture2D ringTexture;
+        Texture2D playerTexture;
+        Texture2D bandana;
+        
+        SpriteFont debugFont, titleFont;
         
         KeyboardState kb, oldkb;
         //SoundEffect backgroundMusic;
@@ -32,10 +36,10 @@ namespace RobotBosses
         MouseState ms;
         Point mousePos;
 
-        bool shouldMakeShadowPaths = false;
+        //bool shouldMakeShadowPaths = false;
         bool shouldAddShadow = true;
 
-        bool debugMode = true;
+        bool debugMode = false;
 
         int gameClock = 1;
 
@@ -53,6 +57,9 @@ namespace RobotBosses
 
         bool colorCountingUp = true;
         int colorNum = 30;
+
+        int fontClock = 0;
+        bool shouldShowText = true;
 
 
         public static int screenWidth = 1080;
@@ -74,7 +81,7 @@ namespace RobotBosses
            shadowBoss, titleScreen, lose, win
         }
 
-        gameState state = gameState.shadowBoss;
+        gameState state = gameState.titleScreen;
 
 
         public Game1()
@@ -114,20 +121,26 @@ namespace RobotBosses
             spriteBatch = new SpriteBatch(GraphicsDevice);
 
             debugFont = Content.Load<SpriteFont>("debugFont");
+            titleFont = Content.Load<SpriteFont>("titleFont");
 
             blankSquare = Content.Load<Texture2D>("blankSquare");
             potionBottle = Content.Load<Texture2D>("potionBottle");
+            ringTexture = Content.Load<Texture2D>("greenLightBall");
+            playerTexture = Content.Load<Texture2D>("snakePlayer2");
+            bandana = Content.Load<Texture2D>("bandana2");
 
             backgroundMusic = Content.Load<Song>("snakeBoss3");
 
-            player = new Player(ref blankSquare,
+            player = new Player(ref playerTexture,
                 new Rectangle(200, 200, playerWidth, playerHeight));
 
             //collectableItem = new Collectable(ref potionBottle,
             //    new Rectangle(200, 200, playerWidth, playerWidth), ref player);
 
-            guardRing = new Ring(Content.Load<Texture2D>("greenLightBall"),
-                new Rectangle(200, 200, playerWidth, playerWidth), ref player, 2);
+            
+
+            guardRing = new Ring(ref ringTexture,
+                new Rectangle(-1200, 200, playerWidth, playerWidth), ref player, 2);
 
             playerHealthBar = new HealthBar(ref blankSquare, new Rectangle(30, screenHeight - 60, 200, 35), 5);
             bossHealthBar = new HealthBar(ref blankSquare, new Rectangle(screenWidth / 2 + 30, screenHeight - 60, 400, 35), 5);
@@ -138,7 +151,7 @@ namespace RobotBosses
             pathMaker.speed = 2;
 
             shadowBoss = new ShadowBoss(ref blankSquare,
-                new Point(400, screenHeight / 2), ref player);
+                new Point(400, screenHeight / 2), ref player, ref guardRing);
 
             // TODO: use this.Content to load your game content here
         }
@@ -173,6 +186,12 @@ namespace RobotBosses
                 case gameState.titleScreen:
                     titleScreen();
                     break;
+                case gameState.win:
+                    win();
+                    break;
+                case gameState.lose:
+                    lose();
+                    break;
 
             }
 
@@ -189,16 +208,73 @@ namespace RobotBosses
             {
                 state = gameState.shadowBoss;
             }
+            fontClock++;
         }
 
         public void win()
         {
+            if(kb.IsKeyDown(Keys.Enter))
+            {
+                reset();
+                state = gameState.shadowBoss;
+            }
 
+            if (kb.IsKeyDown(Keys.Escape))
+            {
+                reset();
+                state = gameState.titleScreen;
+            }
         }
 
         public void lose()
         {
+            if (kb.IsKeyDown(Keys.Enter))
+            {
+                reset();
+                state = gameState.shadowBoss;
+            }
 
+            if (kb.IsKeyDown(Keys.Escape))
+            {
+                reset();
+                state = gameState.titleScreen;
+            }
+        }
+
+        public void reset()
+        {
+            gameClock = 1;
+            currentShadowPathNum = -1;
+            shadowPathStartTime = 0;
+            lightCooldown = 0;
+
+            //player.health = player.startingHealth;
+            //shadowBoss.health = shadowBoss.startingHealth;
+            shadowBoss = null;
+            player = null;
+            player = new Player(ref playerTexture,
+                new Rectangle(200, 200, playerWidth, playerHeight));
+            shadowBoss = new ShadowBoss(ref blankSquare,
+                new Point(400, screenHeight / 2), ref player, ref guardRing);
+
+            guardRing = new Ring(ref ringTexture,
+                new Rectangle(200, 200, playerWidth, playerWidth), ref player, 2);
+
+
+            shouldAddShadow = true;
+
+            colorCountingUp = true;
+            colorNum = 30;
+
+            currentShadowPathNum = -1;
+            shadowPathStartTime = 0;
+
+            pathMaker.resetPos();
+            shadowPathList.Clear();
+
+
+
+            collectables.Clear();
         }
 
         public void shadowBossLevel()
@@ -305,11 +381,19 @@ namespace RobotBosses
 
             if(player.health < player.startingHealth && player.health > 0)
             {
-                if(gameClock % 60 == 0)
+                if(gameClock % 300 == 0)
                 {
                     player.health++;
                 }
             }
+            if (shadowBoss.health < shadowBoss.startingHealth && shadowBoss.health > 0 && lightCooldown == 0)
+            {
+                if (gameClock % 210 == 0)
+                {
+                    shadowBoss.health++;
+                }
+            }
+
 
 
             if (player.currentWeapon == Player.weapon.ring)
@@ -321,12 +405,30 @@ namespace RobotBosses
                 if (player.weaponCooldown == 0)
                     player.currentWeapon = Player.weapon.fist;
             }
+            else
+            {
+                guardRing.setRecX(-1000);
+            }
 
             if (lightCooldown > 0)
             {
                 lightCooldown--;
-                if (gameClock % 30 == 0)
-                    shadowBoss.health--;
+                if (gameClock % 60 == 0)
+                {
+                    shadowBoss.health -= 4;
+                    for (int i = 0; i < shadowBoss.numParts; i++)
+                    {
+                        shadowBoss.getPart(i).hitCooldown += 8;
+                    }
+                }
+            }
+
+            for (int i = 0; i < shadowBoss.numParts; i++)
+            {
+                if (shadowBoss.getPart(i).hitCooldown > 0)
+                {
+                    shadowBoss.getPart(i).hitCooldown--;
+                }
             }
 
             if (player.speedCooldown > 0)
@@ -355,6 +457,14 @@ namespace RobotBosses
                 bossHealthBar.setRecWidth((int)((double)((double)shadowBoss.health / (double)shadowBoss.startingHealth)
                     * (bossHealthBar.getBackground().Width) - bossHealthBar.border * 2));
             }
+
+            if(shadowBoss.health <= 0)
+            {
+                state = gameState.win;
+            }
+
+            if (player.health <= 0)
+                state = gameState.lose;
 
             //playerHealthBar.setRecWidth(player.health * 2);
             gameClock++;
@@ -750,18 +860,35 @@ namespace RobotBosses
             
         }
 
+        public void drawText(SpriteFont fontToUse, string text, int centerX, int centerY, Color color)
+        {
+            Vector2 fontSize = fontToUse.MeasureString(text);
+            spriteBatch.DrawString(fontToUse, text,
+                new Vector2(centerX / 2 - fontSize.X / 2, centerY / 2 - fontSize.Y / 2), color);
+        }
+
         public void drawText(string text, int centerX, int centerY, Color color)
         {
             Vector2 fontSize = debugFont.MeasureString(text);
-            spriteBatch.DrawString(debugFont, text, new Vector2(centerX / 2 - fontSize.X / 2, centerY /2 - fontSize.Y / 2), color);
-            //spriteBatch.DrawString(debugFont, fontWidth.ToString(), new Vector2(100,0), Color.Green);
+            spriteBatch.DrawString(debugFont, text,
+                new Vector2(centerX / 2 - fontSize.X / 2, centerY / 2 - fontSize.Y / 2), color);
         }
 
         public void drawTitleScreen()
         {
             GraphicsDevice.Clear(Color.Black);
 
-            drawText("Press Enter To Start", screenWidth, screenHeight, Color.White);
+            drawText(titleFont, "Shadow Snake's Nest", screenWidth, screenHeight - 200, Color.White);
+
+            drawText("Use WASD or arrow keys to move", screenWidth, screenHeight * 2 - 350, Color.White);
+            drawText("Don't let the Shadow Snake touch you", screenWidth, screenHeight * 2 - 280, Color.White);
+            drawText("Collect powerups to hurt the Shadow Snake", screenWidth, screenHeight * 2 - 200, Color.White);
+
+
+            if (fontClock % 45 == 0)
+                shouldShowText = !shouldShowText;
+            if (shouldShowText)
+                drawText("Press Enter To Start", screenWidth, screenHeight * 2 - 100, Color.White);
 
             //spriteBatch.DrawString(debugFont, "Test", new Vector2(200, 0), Color.Green);
 
@@ -770,22 +897,38 @@ namespace RobotBosses
         public void drawWin()
         {
             GraphicsDevice.Clear(Color.Black);
+            if(gameClock > 3600)
+            { 
+            drawText("You beat the boss! It took you " +gameClock / 3600 + " minutes and " +(gameClock % 3600) / 60 +
+                " seconds!", screenWidth, screenHeight, Color.White);
+                drawText("Press Enter to play again or Escape to go to title!", screenWidth, screenHeight + 100, Color.White);
 
-            drawText("You ran out of health!", screenWidth, screenHeight, Color.White);
+
+            }
+            else
+            {
+                drawText("You beat the boss! It took you " + (gameClock / 60) +
+                " seconds!", screenWidth, screenHeight, Color.White);
+                drawText("Press Enter to play again or Escape to go to title!", screenWidth, screenHeight + 100, Color.White);
+            }
         }
 
         public void drawLose()
         {
+            GraphicsDevice.Clear(Color.Black);
 
+            drawText("You ran out of health!", screenWidth, screenHeight, Color.White);
+            drawText("Press Enter to restart", screenWidth, screenHeight + 80, Color.White);
+            drawText("or Escape to go to title.", screenWidth, screenHeight + 160, Color.White);
         }
 
         public void drawShadowBossLevel()
         {
             
-            if (gameClock % 600 == 0)
+            if (gameClock % 600 == 0 && gameClock != 0)
                 colorCountingUp = !colorCountingUp;
 
-            if (gameClock % 10 == 0)
+            if (gameClock % 10 == 0 && gameClock != 0)
             {
                 if (colorCountingUp)
                     colorNum++;
@@ -812,19 +955,22 @@ namespace RobotBosses
             {
                 if (gameClock % 8 != 0)
                 {
-                    player.drawCharacter(spriteBatch, Color.Red);
+                    player.drawCharacter(spriteBatch, Color.White);
+                    spriteBatch.Draw(bandana, new Rectangle(player.getRecX() - playerWidth /2, player.getRecY() + 5, playerWidth / 2, 8), Color.White);
                 }
             }
             else
             {
-                player.drawCharacter(spriteBatch, Color.Red);
+                player.drawCharacter(spriteBatch, Color.White);
+                spriteBatch.Draw(bandana, new Rectangle(player.getRecX() - playerWidth /2 , player.getRecY() + 5, playerWidth / 2, 8), Color.White);
+
             }
 
-            pathMaker.drawCharacter(spriteBatch, new Color(20, 20, 30));
+            //pathMaker.drawCharacter(spriteBatch, new Color(20, 20, 30));
 
             for (int i = 0; i < shadowPathList.Count; i++)
             {
-                shadowPathList[i].drawCharacter(spriteBatch, new Color(40, 20, 40));
+                shadowPathList[i].drawCharacter(spriteBatch, new Color(0, 20, 0));
             }
 
             int alpha = 200;
